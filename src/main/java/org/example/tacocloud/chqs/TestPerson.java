@@ -18,7 +18,7 @@ class Person {
 
 public class TestPerson{
     public static void main(String[] args) throws Exception{
-        Class<?> cls = Class.forName("Person");
+        Class<?> cls = Class.forName("org.example.tacocloud.chqs.Person");
         Constructor<?> constructor = cls.getDeclaredConstructor(String.class, int.class);
         constructor.setAccessible(true);
         Object obj = constructor.newInstance("Alice",25);
