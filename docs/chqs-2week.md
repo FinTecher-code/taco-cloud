@@ -26,10 +26,11 @@ HyperLogLog 的误差率取决于寄存器数量，而寄存器数量由它占�
 
 **选项：**
 1. 按页面分别创建 HyperLogLog，分别统计各页面访问量
-2. 每天创建一个 HyperLogLog，使用 PFADD 记录访问者 IP，用 PFCOUNT 统计各天访问量 ❌
+2. 每天创建一个 HyperLogLog，使用 PFADD 记录访问者 IP，用 PFCOUNT 统计各天访问量 
 3. 每日创建一个 HyperLogLog，用 PFADD 记录访问者 IP，用 PFMERGE 合并所有天数的数据，再用 PFCOUNT 统计总访问量 ✅
+4. 按每天创建一个 HyperLogLog，使用PFADD 命令记录访问者的IP 地址，使用 PFMERGE 命令合并所有天数的HyperLogLog，使用 PFCOUNT 命令统计总的访问量 ❌
 
-**我的答案：** 选项2 ❌
+**我的答案：** 选项4 ❌
 **正确答案：** 选项3 ✅
 
 **解析：**
