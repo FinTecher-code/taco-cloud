@@ -164,3 +164,110 @@ Apache Tomcat 的 **Coyote 连接器**（Connector）支持以下协议：
 - 选项1：HTTP/1.1 只是其中之一，Coyote 还支持 HTTPS 和 AJP
 - 选项2：错误的是"不支持 AJP"，AJP 是 Coyote 原生支持的 ✅
 - 选项4：WebSocket 是后来通过 NIO 连接器支持的，并非 Coyote 的主要/原生协议
+
+---
+
+## 2026-07-17
+
+### Tomcat — DefaultServlet 职责
+
+**题目**：`DefaultServlet` 主要负责处理什么？
+
+- [ ] 处理静态资源（HTML、CSS、JS、图片等）
+- [ ] 处理动态请求（JSP、Servlet）
+- [ ] 拦截 404 请求
+- [ ] 分发请求到 Servlet
+
+**正确答案**：处理静态资源（HTML、CSS、JS、图片等）
+
+**解析**：
+- `DefaultServlet` 是 Tomcat 内置的默认 Servlet，职责是**处理静态资源**的请求
+- 动态请求（JSP/Servlet）分别由 `JspServlet` 和普通 Servlet 处理
+- 拦截 404 和分发请求都不是它的主要职责
+
+**状态**：❌ 答错
+
+---
+
+### Tomcat — Connector 与 Container 交互方式
+
+**题目**：Tomcat 中 Connector 和 Container 是怎样交互的？
+
+- [ ] Connector 直接将请求交给 Context 处理
+- [ ] Connector 将请求交给 Engine，再由 Engine 交给 Host
+- [x] Connector 解析 HTTP 请求，然后交给 Engine
+- [ ] Container 取代 Connector 解析 HTTP 请求
+
+**正确答案**：Connector 解析 HTTP 请求，然后交给 Engine
+
+**解析**：
+- **Connector** 负责接收并**解析 HTTP 请求**，将其封装为 `Request`/`Response` 对象
+- 解析后交给**Container 容器顶层（Engine）** 处理
+- Engine → Host → Context → Wrapper 逐级向下分发
+- Connector 不直接跟 Context 打交道，Container 也不干解析的活
+
+**状态**：✅ 答对
+
+---
+
+### Tomcat — 顶层容器（整个实例）
+
+**题目**：哪个组件是顶层容器，管理多个 Service，代表整个 Tomcat 实例？
+
+- [ ] Engine
+- [ ] Host
+- [x] Server
+- [ ] Connector
+
+**正确答案**：Server
+
+**解析**：
+- **Server** 是 Tomcat 最顶层组件，代表**整个 Tomcat 实例**
+- 一个 Server 可以包含**多个 Service**
+- 每个 Service 包含若干 Connector + 一个 Engine
+- Engine → Host → Context → Wrapper 都在 Server 管理之下
+- Engine 是 Container 的顶层，但不是整个 Tomcat 实例的顶层
+
+**状态**：✅ 答对
+
+---
+
+### Tomcat — ProtocolHandler 三个重要组件
+
+**题目**：以下哪个**不是** ProtocolHandler 的三个重要组件之一？
+
+- [ ] Endpoint
+- [ ] Processor
+- [ ] Adapter
+- [x] Request
+
+**正确答案**：Request
+
+**解析**：
+- ProtocolHandler 的**三个核心组件**是：**Endpoint**、**Processor**、**Adapter**
+- **Endpoint**：处理底层网络 I/O（Socket 连接）
+- **Processor**：解析 HTTP 请求报文
+- **Adapter**：将解析后的请求适配给 Container 处理
+- **Request** 是 Processor 解析后产生的对象，不是 ProtocolHandler 的组件
+
+**状态**：❌ 答错
+
+---
+
+### MyBatis — Resources 加载配置文件
+
+**题目**：使用 `Resources` 类的哪个方法从 classpath 加载 `mybatis-config.xml` 来构建 `SqlSessionFactory`？
+
+- [x] `getResourceAsStream`
+- [ ] `loadResource` ← 我选的
+- [ ] `openResource`
+- [ ] `readResource`
+
+**正确答案**：`Resources.getResourceAsStream()`
+
+**解析**：
+- MyBatis 的 `org.apache.ibatis.io.Resources` 工具类，从 classpath 加载资源用的是 **`getResourceAsStream()`**
+- 用法：`Resources.getResourceAsStream("mybatis-config.xml")`
+- `loadResource`、`openResource`、`readResource` 都不是 Resources 类的方法
+
+**状态**：❌ 答错
