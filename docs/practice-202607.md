@@ -559,3 +559,89 @@ class Solution {
 | 5 | 缺少 dp 数组 | LIS 需要记录"以每个位置结尾的最长长度"，这里只有一个 `count`，信息量严重不足 |
 
 **本质问题：** 把 LIS 理解成了"统计有多少个递增的数对"，这是两个完全不同的概念。LIS 要求找到**一个可以按顺序串联起来的递增序列**，需要 DP 或贪心+二分才能解决。
+
+
+---
+
+### 题目 4：图书及订阅人、订阅信息查询（SQL）
+
+**表结构：**
+
+```sql
+-- 书籍表
+create table books (
+    book_id int primary key,
+    title varchar(40),
+    author varchar(20),
+    publication_year date
+);
+
+-- 出版社表
+create table publishers (
+    publisher_id int primary key,
+    name varchar(20),
+    address varchar(80)
+);
+
+-- 书籍-出版社关联表（book_id 为主键，一本书只对应一个出版社）
+create table book_publishers (
+    book_id int primary key,
+    publisher_id int,
+    foreign key (book_id) references books(book_id),
+    foreign key (publisher_id) references publishers(publisher_id)
+);
+
+-- 借阅记录表
+create table borrow_records (
+    record_id int primary key,
+    book_id int,
+    member_id int,
+    borrow_date date,
+    return_date date
+);
+
+-- 会员表
+create table members (
+    member_id int primary key,
+    name varchar(20),
+    email varchar(40)
+);
+```
+
+**查询需求：** 查询每本图书的**名称、作者、出版社**以及**对应的借阅次数**，按照借阅次数**倒序**排序。
+
+---
+
+#### 正确 SQL
+
+```sql
+select
+    b.title,
+    b.author,
+    p.name as publisher_name,
+    count(br.record_id) as borrow_count
+from books b
+left join book_publishers bp on b.book_id = bp.book_id
+left join publishers p on bp.publisher_id = p.publisher_id
+left join borrow_records br on b.book_id = br.book_id
+group by b.book_id, b.title, b.author, p.name
+order by borrow_count desc;
+```
+
+---
+
+#### 关键点解析
+
+| 要点 | 说明 |
+|------|------|
+| `LEFT JOIN` | 防止某些书籍没有出版社或没有借阅记录时丢失数据 |
+| `count(br.record_id)` | 按记录 ID 计数，**不能写 `count(*)`** 否则会连没借阅的书也算 1 |
+| `group by b.book_id` | 按书籍分组，`book_id` 是主键，确保分组正确 |
+| `order by borrow_count desc` | 借阅次数倒序 |
+
+#### 常见错误
+
+❌ **错用 `count(*)`**：`LEFT JOIN` 后每本书至少有一行，`count(*)` 会返回 1 而不是 0
+❌ **忘记 `group by`**：不分组直接 `count()` 会返回全局总记录数
+❌ **用 `inner join` 代替 `left join`**：没有借阅记录的图书会被直接丢弃
+❌ **`group by` 漏掉非聚合列**：MySQL 严格模式下会报错
