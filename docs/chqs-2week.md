@@ -465,3 +465,56 @@ SCARD cd
 | **D** ❌ | 完全没用 `<bind>`（题目明确要求用）；`username = CONCAT...` 用 `=` 不是 `LIKE`；花括号 `'%'}` 写反成 `}` 应为 `)` |
 
 **状态**：✅ 答对
+
+---
+
+### 题目：`<choose>` 实现多条件筛选的问题
+
+**场景：** 根据用户名、邮箱、手机号三者至少一个参数筛选用户。
+
+**原代码：**
+```xml
+<select id="selectUsers">
+    SELECT * FROM users WHERE
+    <choose>
+        <when test="username != null">username = #{username}</when>
+        <when test="email != null">email = #{email}</when>
+        <when test="phone != null">phone = #{phone}</when>
+        <otherwise>1=1</otherwise>
+    </choose>
+</select>
+```
+
+**问题：** 同时传入 `username` 和 `email` 时，仅根据 `username` 筛选，email 条件被忽略。
+
+**原因：** `<choose>` 相当于 Java 的 `switch-case`，只执行第一个匹配的 `<when>`，不继续匹配后续条件。
+
+**正确修改：** 改用 `<if>`，每个条件独立判断：
+```xml
+<select id="selectUsers">
+    SELECT * FROM users
+    <where>
+        <if test="username != null">and username = #{username}</if>
+        <if test="email != null">and email = #{email}</if>
+        <if test="phone != null">and phone = #{phone}</if>
+    </where>
+</select>
+```
+
+**解析：**
+- `<choose>/<when>` 用于 **多选一** 场景（如按不同字段排序）
+- `<if>` 用于 **多选多** 场景（多条件组合查询）
+- 题目要求"至少一个参数"，传几个筛几个，必须用 `<if>`
+
+**状态**：✅ 答对
+
+---
+
+## 📊 第二周错题汇总
+
+| 日期 | 题数 | 答对 | 答错 |
+|:----:|:----:|:----:|:----:|
+| 07-14 | 5 | 1 | 4 |
+| 07-17 | 4 | 2 | 2 |
+| 07-19 | 6 | 5 | 1 |
+| **合计** | **15** | **8** | **7** |
