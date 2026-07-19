@@ -347,3 +347,43 @@ SCARD cd
 - ⚠️ 该题平台本身的答案标注有误（平台标 6），实际正确答案为 4
 
 **状态**：❌ 答错（平台答案错误导致）
+
+---
+
+### 题目：关于以下 MyBatis 动态 SQL，说法不正确的是？
+
+```xml
+<select id="selectByUser" parameterType="com.tgb.mybatis.entity.SysUser"
+        resultType="com.tgb.mybaits.entity.Sysuser">
+  select
+    user_name "userName",
+    user_password "userPassword",
+    user_info "userInfo",
+    head_img "headImg",
+    create_time "createTime"
+  from sys_user
+  where 1=1
+  <if test="userName != null and userName != ''">
+    and user_name like CONCAT('%',#{userName},'%')
+  </if>
+  <if test="userEmail != null and userEmail != ''">
+    and user_email = #{userEmail}
+  </if>
+</select>
+```
+
+**选项：**
+1. `where 1=1` 防止所有 if 都不满足时 SQL 拼接出错 ✅
+2. `property != null` 适用于任意字段类型 ✅
+3. `property != null`（不判空串）只适用于 int 类型，不能检查空串 ❌（**不正确的说法**）
+4. 用 `and`/`or` 连接多个 SQL 条件 ✅
+
+**我的答案：** 选项3 ✅
+**正确答案：** 选项3
+
+**解析：**
+- 选项③的错误在于：`int` 是基本类型，**永远不可能为 null**，判 `!= null` 永远返回 true，反而会出问题
+- 反而是 `Integer`（包装类型）可以判 null，适用于所有引用类型
+- 所以这句话**前后说反了**——判 null 适合引用类型，对 `int` 基本类型无意义
+
+**状态**：✅ 答对
