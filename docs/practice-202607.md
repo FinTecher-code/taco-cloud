@@ -344,3 +344,185 @@ class Solution {
 | 8 | **核心逻辑缺失** | 没有建图、没有 Dijkstra/BFS，根本不算最短路径 | 整段重写，见上方正确实现 |
 
 **本质问题：** 直接把 `edges[i][0]` 当二维数组下标用，但 `edges` 是 `String[]`，每个元素是像 `"2,1,1"` 的字符串，必须先用 `split(",")` 解析成三个整数，再建图跑 Dijkstra。
+
+
+---
+
+### 题目 3：最长递增子序列（LIS）
+
+**题目描述：**
+给定一个整数数组 nums，找到其中最长严格递增子序列的长度。子序列可以不连续。
+
+**规则：**
+- 子序列指删除一些元素而不改变剩余元素顺序
+- 严格递增指每个元素都比前一个大
+- `1 ≤ nums.length ≤ 2500`
+- `-10⁴ ≤ nums[i] ≤ 10⁴`
+
+**输入：** 字符串形式的数组，如 `"[10,9,2,5,3,7,101,18]"`
+**输出：** 最长递增子序列的长度
+
+**示例：**
+```
+输入: "[10,9,2,5,3,7,101,18]"
+输出: 4
+解释: 最长递增子序列是 [2,3,7,101]，长度为 4
+```
+
+---
+
+#### 解题思路
+
+**方法一：动态规划 O(n²)**
+
+`dp[i]` 表示以 `nums[i]` 结尾的最长递增子序列长度。
+
+```
+dp[i] = max(dp[j] + 1)  其中 j < i 且 nums[j] < nums[i]
+```
+
+最终结果取 `max(dp)`
+
+**方法二：贪心 + 二分查找 O(n log n)**
+
+维护数组 `tails`，`tails[i]` 表示长度为 i+1 的递增子序列的最小结尾元素。
+遍历 nums，对每个数二分查找其在 tails 中的位置，替换或追加。
+
+---
+
+#### Java 实现
+
+```java
+import java.util.*;
+
+public class Solution {
+    // 方法一：DP O(n²)
+    public static int lengthOfLIS_DP(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        int n = nums.length;
+        int[] dp = new int[n];
+        Arrays.fill(dp, 1);
+        int maxLen = 1;
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[j] < nums[i]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+            maxLen = Math.max(maxLen, dp[i]);
+        }
+        return maxLen;
+    }
+
+    // 方法二：贪心 + 二分 O(n log n) — 最优
+    public static int lengthOfLIS(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+        int[] tails = new int[nums.length];
+        int size = 0;
+
+        for (int x : nums) {
+            int left = 0, right = size;
+            // 二分查找第一个 >= x 的位置
+            while (left < right) {
+                int mid = left + (right - left) / 2;
+                if (tails[mid] < x) {
+                    left = mid + 1;
+                } else {
+                    right = mid;
+                }
+            }
+            tails[left] = x;
+            if (left == size) size++;
+        }
+        return size;
+    }
+
+    // 解析输入： "[10,9,2,5,3,7,101,18]" → int[]
+    public static int[] parseArray(String s) {
+        s = s.trim();
+        if (s.startsWith("[") && s.endsWith("]")) {
+            s = s.substring(1, s.length() - 1);
+        }
+        if (s.isEmpty()) return new int[0];
+        String[] parts = s.split(",");
+        int[] res = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            res[i] = Integer.parseInt(parts[i].trim());
+        }
+        return res;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = parseArray("[10,9,2,5,3,7,101,18]");
+        System.out.println(lengthOfLIS(nums));     // 4
+        System.out.println(lengthOfLIS_DP(nums));  // 4
+    }
+}
+```
+
+---
+
+#### Python 实现
+
+```python
+from typing import List
+import bisect
+
+
+# 方法一：DP O(n²)
+def length_of_lis_dp(nums: List[int]) -> int:
+    if not nums:
+        return 0
+    dp = [1] * len(nums)
+    for i in range(1, len(nums)):
+        for j in range(i):
+            if nums[j] < nums[i]:
+                dp[i] = max(dp[i], dp[j] + 1)
+    return max(dp)
+
+
+# 方法二：贪心 + 二分 O(n log n) — 最优
+def length_of_lis(nums: List[int]) -> int:
+    tails = []  # tails[i] = 长度为 i+1 的递增子序列的最小结尾元素
+    for x in nums:
+        pos = bisect.bisect_left(tails, x)  # 第一个 >= x 的位置
+        if pos == len(tails):
+            tails.append(x)
+        else:
+            tails[pos] = x
+    return len(tails)
+
+
+# 解析输入
+def parse_array(s: str) -> List[int]:
+    s = s.strip()
+    if s.startswith("[") and s.endswith("]"):
+        s = s[1:-1]
+    if not s:
+        return []
+    return [int(x.strip()) for x in s.split(",")]
+
+
+# 测试
+if __name__ == "__main__":
+    nums = parse_array("[10,9,2,5,3,7,101,18]")
+    print(length_of_lis(nums))      # 4
+    print(length_of_lis_dp(nums))   # 4
+```
+
+---
+
+#### 两种方法对比
+
+| 方法 | 时间复杂度 | 空间复杂度 | 适用场景 |
+|------|:---------:|:---------:|---------|
+| DP | O(n²) | O(n) | 容易理解，n ≤ 1000 可接受 |
+| 贪心 + 二分 | O(n log n) | O(n) | **最优解**，n ≤ 2500 刚好够用 |
+
+#### 易错点
+
+- 严格递增是 `nums[j] < nums[i]`，不是 `<=`
+- 子序列可以不连续，但顺序不能变
+- 输入是字符串格式，要先解析成 int 数组
+- 贪心+二分法中 `bisect_left` / 二分查找找的是**第一个 >= x** 的位置
