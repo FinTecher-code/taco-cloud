@@ -102,3 +102,52 @@ public class Solution {
     }
 }
 ```
+
+
+#### Python 版本
+
+```python
+def average_of_digits(s: str) -> float:
+    """
+    计算字符串中数字字符的平均值
+    :param s: 输入字符串
+    :return: 平均值，保留两位小数
+    """
+    if not s:
+        return 0.0
+
+    total = 0
+    count = 0
+
+    for ch in s:
+        if ch.isdigit():
+            total += int(ch)
+            count += 1
+
+    if count == 0:
+        return 0.0
+
+    avg = total / count
+    return round(avg, 2)
+
+
+# 测试
+if __name__ == "__main__":
+    print(average_of_digits("a1b2c3"))   # 2.0
+    print(average_of_digits("abc"))      # 0.0
+    print(average_of_digits(""))         # 0.0
+    print(average_of_digits("999"))      # 9.0
+```
+
+**Python 与 Java 的对比差异：**
+
+| 维度 | Java | Python |
+|------|------|--------|
+| 遍历字符 | `s.charAt(i)` | `for ch in s` 直接遍历 |
+| 判数字 | `Character.isDigit(ch)` | `ch.isdigit()` |
+| 字符转数字 | `ch - '0'` | `int(ch)` |
+| 保留小数 | `String.format("%.2f", avg)` 转回 double | `round(avg, 2)` |
+| 判空 | `s == null || s.isEmpty()` | `not s` |
+| 函数定义 | `public static double average(...)` | `def average(...) -> float` |
+
+Python 简洁很多，但注意 `round()` 不强制显示两位小数（`2.0` 而不是 `2.00`），严格输出可用 `f"{avg:.2f}"`。
