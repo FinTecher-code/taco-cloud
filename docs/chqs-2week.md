@@ -387,3 +387,81 @@ SCARD cd
 - 所以这句话**前后说反了**——判 null 适合引用类型，对 `int` 基本类型无意义
 
 **状态**：✅ 答对
+
+---
+
+### 题目：MyBatis `<bind>` 模糊搜索 — 选出正确的填充代码
+
+**场景：** 社交平台用户查询，按 `searchKey`（用户名模糊匹配）和 `status`（可选）筛选。
+
+```xml
+<mapper namespace="com.example.mapper.UserMapper">
+  <select id="searchUsers" parameterType="java.util.Map" resultType="com.example.model.User">
+    select id, username, status, created_at
+    from t_user
+    <where>
+      /* 代码缺失 */
+    </where>
+  </select>
+</mapper>
+```
+
+**选项：**
+
+**A.** ✅
+```xml
+<bind name="pattern" value="'%' + searchKey + '%'"/>
+<if test="searchKey != null and searchKey != ''">
+    AND username LIKE #{pattern}
+</if>
+<if test="status != null and status != ''">
+    AND status = #{status}
+</if>
+```
+
+**B.** ❌
+```xml
+<bind name="pattern" value="searchKey" />
+<if test="pattern != ''">
+    OR username LIKE #{searchKey}
+</if>
+<if test="status != ''">
+    AND status = #{status}
+</if>
+```
+
+**C.** ❌
+```xml
+<bind name="searchKey" value="'%' + searchKey + '%'"/>
+<if test="searchKey == null">
+    AND username LIKE #{searchKey}
+</if>
+<if test="status != null">
+    OR status = #{status}
+</if>
+```
+
+**D.** ❌
+```xml
+<if test="searchKey != null">
+    username = CONCAT('%', #{searchKey}, '%'}
+</if>
+<if test="status != ''">
+    status = #{status}
+</if>
+<bind name="extra" value="'unused'" />
+```
+
+**我的答案：** 选项A ✅
+**正确答案：** 选项A
+
+**解析：**
+
+| 选项 | 问题 |
+|:----:|------|
+| **A** ✅ | `<bind>` 用 `'%' + searchKey + '%'` 拼装通配符；判空完整（null + 空串）；`#{pattern}` 引用绑定变量；`<where>` 自动处理 AND |
+| **B** ❌ | `<bind value="searchKey">` 没加 `%` 通配符；`OR` 拼接在 `<where>` 内错误；没判 null 可能 NPE；`#{searchKey}` 未引用绑定变量 |
+| **C** ❌ | `<bind name="searchKey">` 覆盖了原参数（命名冲突）；`test="searchKey == null"` 条件写反了；`OR` 错误 |
+| **D** ❌ | 完全没用 `<bind>`（题目明确要求用）；`username = CONCAT...` 用 `=` 不是 `LIKE`；花括号 `'%'}` 写反成 `}` 应为 `)` |
+
+**状态**：✅ 答对
