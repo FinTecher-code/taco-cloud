@@ -271,3 +271,79 @@ Apache Tomcat 的 **Coyote 连接器**（Connector）支持以下协议：
 - `loadResource`、`openResource`、`readResource` 都不是 Resources 类的方法
 
 **状态**：❌ 答错
+
+---
+
+## 2026-07-19
+
+### 题目：MyBatis `<foreach>` 标签不包含哪个属性？
+
+**选项：**
+1. `collection`
+2. `itif` ✅（正确答案）
+3. `index`
+4. `separator`
+
+**我的答案：** `itif` ✅
+**正确答案：** 选项2 - `itif`
+
+**解析：**
+MyBatis `<foreach>` 标签的有效属性共 6 个：
+
+| 属性 | 说明 |
+|------|------|
+| `collection` | 必填，要遍历的集合/数组名 |
+| `item` | 每次迭代的元素变量名 |
+| `index` | 当前索引（从0开始）|
+| `open` | 开头字符串，如 `(` |
+| `close` | 结尾字符串，如 `)` |
+| `separator` | 元素之间的分隔符，如 `,` |
+
+- **`itif`** 不是任何合法属性名，纯干扰项
+- `collection` 是必填属性，`index` 和 `separator` 都是可选合法属性
+
+**状态**：✅ 答对
+
+---
+
+### 题目：执行以下 Redis 命令后，`SCARD cd` 输出是什么？
+
+```
+SADD ca "php" "java" "go" "c" "ruby" "julia"
+SMOVE ca cb "julia"
+SADD cb "ruby"
+SDIFFSTORE cc ca cb
+SMOVE cc ca "php"
+SREM ca "go" "ruby" "julia"
+SUNIONSTORE cd ca cc
+SCARD cd
+```
+
+**选项：**
+1. `4` ✅ (正确答案)
+2. `3`
+3. `6` ❌ (平台标注的答案，有误)
+4. `2`
+
+**我的答案：** `6` ❌（按平台错误答案选的）
+**正确答案：** `4` ✅
+
+**逐步推导：**
+
+| 步骤 | 命令 | ca | cb | cc | cd |
+|------|------|:--:|:--:|:--:|:--:|
+| ① | `SADD ca 6个元素` | {php,java,go,c,ruby,julia} | ∅ | ∅ | ∅ |
+| ② | `SMOVE ca→cb julia` | {php,java,go,c,ruby} | {julia} | ∅ | ∅ |
+| ③ | `SADD cb ruby` | {php,java,go,c,ruby} | {julia,ruby} | ∅ | ∅ |
+| ④ | `SDIFFSTORE cc ca⊖cb` | {php,java,go,c,ruby} | {julia,ruby} | **{php,java,go,c}** | ∅ |
+| ⑤ | `SMOVE cc→ca php` | {php,java,go,c,ruby} | {julia,ruby} | {java,go,c} | ∅ |
+| ⑥ | `SREM ca go ruby julia` | **{php,java,c}** | {julia,ruby} | {java,go,c} | ∅ |
+| ⑦ | `SUNIONSTORE cd ca∪cc` | {php,java,c} | {julia,ruby} | {java,go,c} | **{php,java,c,go}** |
+| ⑧ | `SCARD cd` | | | | **→ 4** |
+
+**关键细节：**
+- 步骤⑥：`julia` 早已不在 ca 中（步骤②已移到 cb），所以只移除了 `go` 和 `ruby`，ca 剩下 {php, java, c}
+- 步骤⑦：并集 {php, java, c} ∪ {java, go, c} = {php, java, c, go}，共 4 个元素
+- ⚠️ 该题平台本身的答案标注有误（平台标 6），实际正确答案为 4
+
+**状态**：❌ 答错（平台答案错误导致）
