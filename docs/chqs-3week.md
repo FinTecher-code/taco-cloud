@@ -15,6 +15,7 @@
 | 7 | Producer 优化写入速度 | Kafka 生产者 | ✅ |
 | 8 | 消费者未提交 offset | Kafka 消费者 | ❌ |
 | 9 | 分区键映射描述 | Kafka 分区器 | ❌ |
+| 10 | 心跳参数描述 | Kafka 消费者 | ❌ |
 
 ---
 
@@ -280,10 +281,38 @@ Kafka producer 优化写入速度的有效方法包括：
 
 ---
 
+---
+
+### ❌ 10. Kafka — 心跳参数
+
+**题目:** 下列关于 Kafka 消费者心跳描述错误的是？
+
+**选项:**
+1. ✅ 一般情况下 heartbeat.interval.ms 的时间会设置得比 session.timeout.ms 要大，session.timeout.ms 的默认值是 30s（正确答案）
+2. ❌ session.timeout.ms 指定消费者被认定死亡之前可以与服务器断开连接的时间（我的答案）
+3. heartbeat.interval.ms 指定了向协调器发送心跳的频率
+4. 把 session.timeout.ms 值设置的大一点可以减少意外的再均衡
+
+**我的答案:** 选项2 ❌
+**正确答案:** 选项1 ✅
+
+**解析:**
+- 这道题的核心要记住：**heartbeat.interval.ms** **** **session.timeout.ms**（心跳间隔小于会话超时）
+- 典型配置：heartbeat.interval.ms=3s，session.timeout.ms=45s
+- **选项1** 说 heartbeat 比 session timeout 大——这是错的，所以它是正确答案（题目问“错误的是”）
+- **选项2** 其实是对 session.timeout.ms 的**正确描述**
+- **选项4** 也是对的：增大 session.timeout.ms 可以给消费者更多时间发送心跳，减少不必要的 rebalance
+
+**关键记忆:**
+> **heartbeat.interval.ms**（3s）< **session.timeout.ms**（45s）
+> 心跳间隔比会话超时小，不是大。
+
+---
+
 ## 📊 第三周刷题汇总
 
 | 日期 | 题数 | 答对 | 答错 | 正确率 |
 |:----:|:----:|:----:|:----:|:------:|
 | 07-21 | 5 | 2 | 3 | 40% |
-| 07-22 | 4 | 1 | 3 | 25% |
-| **合计** | **9** | **3** | **6** | **33%** |
+| 07-22 | 5 | 1 | 4 | 20% |
+| **合计** | **10** | **3** | **7** | **30%** |
