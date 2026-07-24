@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章管理 - Blog Admin</title>
+    <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <div class="sidebar" id="sidebar"></div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h2>文章管理</h2>
+                <button class="btn btn-primary" onclick="showAddModal()">+ 新建文章</button>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:60px;">ID</th>
+                                <th>标题</th>
+                                <th style="width:100px;">作者</th>
+                                <th style="width:100px;">分类</th>
+                                <th style="width:80px;">状态</th>
+                                <th style="width:80px;">浏览</th>
+                                <th style="width:80px;">点赞</th>
+                                <th style="width:160px;">时间</th>
+                                <th style="width:140px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="articleBody">
+                            <tr><td colspan="9" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="color:#999;font-size:13px;" id="pageInfo">共 0 条</span>
+                <div>
+                    <button class="btn btn-sm" id="prevBtn" onclick="changePage(-1)">上一页</button>
+                    <span style="margin:0 12px;font-size:13px;" id="pageNum">第 1 页</span>
+                    <button class="btn btn-sm" id="nextBtn" onclick="changePage(1)">下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        checkAuth();
+        renderSidebar();
+
+        let currentPage = 1;
+        let totalPages = 1;
+        let categories = [];
+
+        /** 加载分类列表（供下拉框使用） */
+        async function loadCategories() {
+            const res = await apiGet('/api/categories');
+            if (res.code === 200 && res.data) {
+                categories = res.data;
+            }
+        }
+
+        /** 渲染分类下拉选项 */
+        function renderCategoryOptions(selectedId) {
+            const none = '<option value="">- 无 -</option>';
+            const opts = categories.map(c =>
+                `<option value="${c.id}" ${c.id == selectedId ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
+            ).join('');
+            return none + opts;
+        }
+
+        /** 加载文章列表 */
+        async function loadArticles() {
+            const tbody = document.getElementById('articleBody');
+            tbody.innerHTML = '<tr><td colspan="9" class="loading">加载中...</td></tr>';
+
+            try {
+                const res = await apiGet('/api/articles?page=' + currentPage + '&size=10');
+                if (res.code === 200 && res.data) {
+                    const records = res.data.records || [];
+                    totalPages = res.data.pages || 1;
+                    const total = res.data.total || 0;
+
+                    document.getElementById('pageInfo').textContent = '共 ' + total + ' 条';
+                    document.getElementById('pageNum').textContent = '第 ' + currentPage + ' 页';
+                    document.getElementById('prevBtn').disabled = currentPage <= 1;
+                    document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+
+                    if (records.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">暂无文章</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = records.map(a => `
+                        <tr>
+                            <td>${a.id}</td>
+                            <td><a href="javascript:void(0)" onclick="editArticle(${a.id})">${escapeHtml(a.title)}</a></td>
+                            <td>${escapeHtml(a.username || '-')}</td>
+                            <td>${escapeHtml(a.categoryName || '-')}</td>
+                            <td><span class="tag ${a.status === 1 ? 'tag-green' : 'tag-orange'}">${a.status === 1 ? '已发布' : '草稿'}</span></td>
+                            <td>${a.viewCount || 0}</td>
+                            <td>${a.likeCount || 0}</td>
+                            <td>${formatDateTime(a.createdAt)}</td>
+                            <td>
+                                <button class="btn btn-sm" onclick="editArticle(${a.id})">编辑</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteArticle(${a.id})">删除</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state">加载失败</td></tr>';
+            }
+        }
+
+        /** 翻页 */
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            if (newPage < 1 || newPage > totalPages) return;
+            currentPage = newPage;
+            loadArticles();
+        }
+
+        /** 打开新建文章弹窗 */
+        function showAddModal() {
+            const user = getCurrentUser();
+            showModal('新建文章', `
+                <div class="form-group">
+                    <label>标题</label>
+                    <input class="form-input" id="editTitle" placeholder="文章标题">
+                </div>
+                <div class="form-group">
+                    <label>分类</label>
+                    <select class="form-select" id="editCategoryId">${renderCategoryOptions()}</select>
+                </div>
+                <div class="form-group">
+                    <label>摘要</label>
+                    <textarea class="form-textarea" id="editSummary" rows="2" placeholder="文章摘要（可选）"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>内容</label>
+                    <textarea class="form-textarea" id="editContent" rows="6" placeholder="文章内容（Markdown）"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>状态</label>
+                    <select class="form-select" id="editStatus">
+                        <option value="0">草稿</option>
+                        <option value="1">已发布</option>
+                    </select>
+                </div>
+            `, [
+                { text: '取消', type: '', onClick: hideModal },
+                { text: '保存', type: 'primary', onClick: () => saveArticle(null) }
+            ]);
+        }
+
+        /** 打开编辑文章弹窗 */
+        async function editArticle(id) {
+            try {
+                const res = await apiGet('/api/articles/' + id);
+                if (res.code === 200 && res.data) {
+                    const a = res.data;
+                    showModal('编辑文章', `
+                        <div class="form-group">
+                            <label>标题</label>
+                            <input class="form-input" id="editTitle" value="${escapeHtml(a.title)}">
+                        </div>
+                        <div class="form-group">
+                            <label>分类</label>
+                            <select class="form-select" id="editCategoryId">${renderCategoryOptions(a.categoryId)}</select>
+                        </div>
+                        <div class="form-group">
+                            <label>摘要</label>
+                            <textarea class="form-textarea" id="editSummary" rows="2">${escapeHtml(a.summary || '')}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>内容</label>
+                            <textarea class="form-textarea" id="editContent" rows="6">${escapeHtml(a.content || '')}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <select class="form-select" id="editStatus">
+                                <option value="0" ${a.status === 0 ? 'selected' : ''}>草稿</option>
+                                <option value="1" ${a.status === 1 ? 'selected' : ''}>已发布</option>
+                            </select>
+                        </div>
+                    `, [
+                        { text: '取消', type: '', onClick: hideModal },
+                        { text: '保存', type: 'primary', onClick: () => saveArticle(id) }
+                    ]);
+                }
+            } catch (e) {
+                showToast('加载文章失败', 'error');
+            }
+        }
+
+        /** 保存文章（新建或更新） */
+        async function saveArticle(id) {
+            const title = document.getElementById('editTitle').value.trim();
+            if (!title) { showToast('标题不能为空', 'error'); return; }
+
+            const data = {
+                title,
+                categoryId: document.getElementById('editCategoryId').value || null,
+                summary: document.getElementById('editSummary').value.trim(),
+                content: document.getElementById('editContent').value.trim(),
+                status: parseInt(document.getElementById('editStatus').value),
+            };
+
+            try {
+                let res;
+                if (id) {
+                    res = await apiPut('/api/articles/' + id, data);
+                } else {
+                    data.userId = getCurrentUser().id;
+                    res = await apiPost('/api/articles', data);
+                }
+
+                if (res.code === 200) {
+                    hideModal();
+                    showToast(id ? '更新成功' : '创建成功', 'success');
+                    loadArticles();
+                } else {
+                    showToast(res.message || '保存失败', 'error');
+                }
+            } catch (e) {
+                showToast('网络错误', 'error');
+            }
+        }
+
+        /** 删除文章 */
+        function deleteArticle(id) {
+            showModal('确认删除', '<p>确定要删除这篇文章吗？删除后不可恢复。</p>', [
+                { text: '取消', type: '', onClick: hideModal },
+                { text: '删除', type: 'danger', onClick: async () => {
+                    try {
+                        const res = await apiDelete('/api/articles/' + id);
+                        if (res.code === 200) {
+                            hideModal();
+                            showToast('删除成功', 'success');
+                            loadArticles();
+                        } else {
+                            showToast(res.message || '删除失败', 'error');
+                        }
+                    } catch (e) {
+                        showToast('网络错误', 'error');
+                    }
+                }}
+            ]);
+        }
+
+        // 初始化
+        loadCategories().then(() => loadArticles());
+    </script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分类管理 - Blog Admin</title>
+    <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <div class="sidebar" id="sidebar"></div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h2>分类管理</h2>
+                <button class="btn btn-primary" onclick="showAddModal()">+ 新建分类</button>
+            </div>
+
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:60px;">ID</th>
+                                <th>分类名称</th>
+                                <th>描述</th>
+                                <th style="width:160px;">创建时间</th>
+                                <th style="width:140px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryBody">
+                            <tr><td colspan="5" class="loading">加载中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        checkAuth();
+        renderSidebar();
+
+        /** 加载分类列表 */
+        async function loadCategories() {
+            const tbody = document.getElementById('categoryBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="loading">加载中...</td></tr>';
+
+            try {
+                const res = await apiGet('/api/categories');
+                if (res.code === 200 && res.data) {
+                    const data = res.data;
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">暂无分类</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = data.map(c => `
+                        <tr>
+                            <td>${c.id}</td>
+                            <td><strong>${escapeHtml(c.name)}</strong></td>
+                            <td style="color:#666;">${escapeHtml(c.description || '-')}</td>
+                            <td>${formatDateTime(c.createdAt)}</td>
+                            <td>
+                                <button class="btn btn-sm" onclick="editCategory(${c.id}, '${escapeHtml(c.name)}', '${escapeHtml(c.description || '')}')">编辑</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteCategory(${c.id})">删除</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">加载失败</td></tr>';
+            }
+        }
+
+        /** 打开新建分类弹窗 */
+        function showAddModal() {
+            showModal('新建分类', `
+                <div class="form-group">
+                    <label>分类名称</label>
+                    <input class="form-input" id="editName" placeholder="例如：技术分享">
+                </div>
+                <div class="form-group">
+                    <label>描述（可选）</label>
+                    <textarea class="form-textarea" id="editDesc" rows="3" placeholder="分类描述"></textarea>
+                </div>
+            `, [
+                { text: '取消', type: '', onClick: hideModal },
+                { text: '保存', type: 'primary', onClick: () => saveCategory(null) }
+            ]);
+        }
+
+        /** 打开编辑分类弹窗 */
+        function editCategory(id, name, desc) {
+            showModal('编辑分类', `
+                <div class="form-group">
+                    <label>分类名称</label>
+                    <input class="form-input" id="editName" value="${name}">
+                </div>
+                <div class="form-group">
+                    <label>描述（可选）</label>
+                    <textarea class="form-textarea" id="editDesc" rows="3">${desc}</textarea>
+                </div>
+            `, [
+                { text: '取消', type: '', onClick: hideModal },
+                { text: '保存', type: 'primary', onClick: () => saveCategory(id) }
+            ]);
+        }
+
+        /** 保存分类 */
+        async function saveCategory(id) {
+            const name = document.getElementById('editName').value.trim();
+            if (!name) { showToast('分类名称不能为空', 'error'); return; }
+
+            const data = {
+                name,
+                description: document.getElementById('editDesc').value.trim(),
+            };
+
+            try {
+                let res;
+                if (id) {
+                    res = await apiPut('/api/categories/' + id, data);
+                } else {
+                    res = await apiPost('/api/categories', data);
+                }
+
+                if (res.code === 200) {
+                    hideModal();
+                    showToast(id ? '更新成功' : '创建成功', 'success');
+                    loadCategories();
+                } else {
+                    showToast(res.message || '保存失败', 'error');
+                }
+            } catch (e) {
+                showToast('网络错误', 'error');
+            }
+        }
+
+        /** 删除分类 */
+        function deleteCategory(id) {
+            showModal('确认删除', '<p>确定要删除这个分类吗？</p>', [
+                { text: '取消', type: '', onClick: hideModal },
+                { text: '删除', type: 'danger', onClick: async () => {
+                    try {
+                        const res = await apiDelete('/api/categories/' + id);
+                        if (res.code === 200) {
+                            hideModal();
+                            showToast('删除成功', 'success');
+                            loadCategories();
+                        } else {
+                            showToast(res.message || '删除失败', 'error');
+                        }
+                    } catch (e) {
+                        showToast('网络错误', 'error');
+                    }
+                }}
+            ]);
+        }
+
+        loadCategories();
+    </script>
+</body>
+</html>
