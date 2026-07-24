@@ -1,142 +1,330 @@
 <!DOCTYPE html>
+<!-- ============================================================
+     远程数据实时看板页面
+     ============================================================
+     功能说明：
+       1. 页面加载时，调用 GET /api/remote-data 拉取历史数据展示在表格中
+       2. 通过 EventSource 连接 GET /api/remote-data/subscribe（SSE）
+       3. 远端系统每推送一条新数据，页面就实时更新表格 + 弹通知
+     ============================================================ -->
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>远程数据实时看板</title>
     <style>
+        /* ===== 全局样式重置 ===== */
+        /* 让所有元素的外边距和内边距归零，使用更直观的盒模型 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; padding: 24px; color: #333; }
+
+        /* ===== 页面主体 ===== */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f0f2f5;   /* 浅灰色背景，更柔和 */
+            padding: 24px;          /* 页面四周留白 */
+            color: #333;            /* 文字主色 */
+        }
+
+        /* ===== 内容容器 ===== */
         .container { max-width: 1200px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+
+        /* ===== 页面头部 ===== */
+        .header {
+            display: flex;                     /* 弹性布局，标题和按钮在一行 */
+            justify-content: space-between;    /* 左右分开 */
+            align-items: center;               /* 垂直居中 */
+            margin-bottom: 24px;
+        }
         .header h1 { font-size: 22px; }
-        .badge { background: #52c41a; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; }
-        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+
+        /* ===== 状态徽标（已连接/已断开） ===== */
+        .badge {
+            background: #52c41a; color: #fff;
+            padding: 4px 12px; border-radius: 12px; font-size: 12px;
+        }
+
+        /* ===== 表格外层容器 ===== */
+        .table-wrap {
+            background: #fff;
+            border-radius: 8px;             /* 圆角 */
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);  /* 轻微阴影，有层次感 */
+            overflow: hidden;               /* 圆角裁切 */
+        }
+
+        /* ===== 表格 ===== */
         table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-        th { background: #fafafa; font-weight: 600; color: #666; }
+        th, td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;  /* 行间分割线 */
+            font-size: 14px;
+        }
+        th {
+            background: #fafafa;    /* 表头浅灰色背景 */
+            font-weight: 600;
+            color: #666;
+        }
+        /* 鼠标悬停行时高亮 */
         tr:hover { background: #fafafa; }
-        .sse-status { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
-        .sse-status.online { background: #52c41a; }
-        .sse-status.offline { background: #ff4d4f; }
+
+        /* ===== SSE 连接状态指示灯 ===== */
+        .sse-status {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;        /* 圆形 */
+            margin-right: 6px;
+        }
+        .sse-status.online  { background: #52c41a; }   /* 绿色：已连接 */
+        .sse-status.offline { background: #ff4d4f; }   /* 红色：已断开 */
+
+        /* ===== 空数据提示 ===== */
         .empty { text-align: center; padding: 60px 0; color: #999; }
-        .toast { position: fixed; top: 24px; right: 24px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; padding: 12px 20px; font-size: 14px; border-left: 4px solid #1890ff; transition: all .3s; opacity: 0; transform: translateY(-10px); pointer-events: none; }
-        .toast.show { opacity: 1; transform: translateY(0); }
+
+        /* ===== 右上角通知弹窗 ===== */
+        .toast {
+            position: fixed;        /* 固定定位，始终在窗口右上角 */
+            top: 24px; right: 24px;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);  /* 阴影浮起效果 */
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-left: 4px solid #1890ff;  /* 左侧蓝色条纹，更醒目 */
+            transition: all .3s;     /* 动画过渡 */
+            opacity: 0;              /* 默认隐藏 */
+            transform: translateY(-10px);  /* 默认向上偏移 */
+            pointer-events: none;    /* 不阻挡点击 */
+        }
+        .toast.show {
+            opacity: 1;              /* 显示 */
+            transform: translateY(0); /* 回到原位 */
+        }
     </style>
 </head>
 <body>
+
 <div class="container">
+
+    <!-- ===== 页面头部：标题 + 连接状态 + 刷新按钮 ===== -->
     <div class="header">
         <div>
             <h1>远程数据实时看板</h1>
             <div style="margin-top: 6px; font-size: 13px; color: #999;">
+                <!-- SSE 连接状态指示灯 -->
                 <span class="sse-status" id="sseDot"></span>
                 <span id="sseLabel">连接中...</span>
                 &nbsp;&nbsp;| 共 <strong id="totalCount">0</strong> 条记录
             </div>
         </div>
-        <button onclick="loadData()" style="padding: 6px 16px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;">刷新</button>
+        <!-- 手动刷新按钮（一般用不到，SSE 会自动更新，留着备用） -->
+        <button onclick="loadData()"
+                style="padding: 6px 16px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;">
+            刷新
+        </button>
     </div>
 
+    <!-- ===== 数据表格 ===== -->
     <div class="table-wrap">
         <table>
+            <!-- 表头 -->
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>来源</th>
-                    <th>数据类型</th>
-                    <th>数据内容</th>
-                    <th>状态</th>
-                    <th>接收时间</th>
+                    <th>ID</th>              <!-- 数据库自增主键 -->
+                    <th>来源</th>            <!-- 数据从哪个系统来的 -->
+                    <th>数据类型</th>        <!-- 什么业务类型 -->
+                    <th>数据内容</th>        <!-- 具体数据（JSON） -->
+                    <th>状态</th>            <!-- 处理状态 -->
+                    <th>接收时间</th>        <!-- 什么时候入库的 -->
                 </tr>
             </thead>
+            <!-- 数据行，由 JavaScript 动态渲染 -->
             <tbody id="dataBody">
                 <tr><td colspan="6" class="empty">加载中...</td></tr>
             </tbody>
         </table>
     </div>
+
 </div>
 
+<!-- ===== 右上角通知弹窗（新数据到达时弹出） ===== -->
 <div class="toast" id="toast"></div>
 
+<!-- ============================================================
+     JavaScript 逻辑代码
+     ============================================================ -->
 <script>
+    // ===== 常量定义 =====
+
+    /** 查询历史数据的 API 地址 */
     const DATA_URL = '/api/remote-data';
+
+    /** SSE 订阅地址（实时推送） */
     const SSE_URL = '/api/remote-data/subscribe';
 
+    /** 当前总记录数，用于更新页面显示 */
     let totalCount = 0;
 
+    // ===== 渲染数据表格 =====
+
+    /**
+     * 把从后端查到的数据列表渲染到 HTML 表格中
+     *
+     * @param records 数据列表，每个元素包含 id/source/dataType/dataContent/status/createdAt
+     */
     function renderRows(records) {
+        // 找到表格的 tbody 元素
         const tbody = document.getElementById('dataBody');
+
+        // 如果没有数据，显示"暂无数据"
         if (!records || records.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty">暂无数据</td></tr>';
             document.getElementById('totalCount').textContent = '0';
             return;
         }
+
+        // 更新总记录数显示
         totalCount = records.length;
         document.getElementById('totalCount').textContent = totalCount;
+
+        // 把每条记录转成 HTML 行，然后拼接到一起
+        // .map() 遍历数组，把每条记录转成 <tr>...</tr> 字符串
+        // .join('') 把数组中的所有字符串拼接成一个完整的 HTML 字符串
         tbody.innerHTML = records.map(r => `
             <tr>
+                <!-- ID -->
                 <td>${r.id}</td>
-                <td><span style="background: #e6f7ff; padding: 2px 8px; border-radius: 4px;">${escapeHtml(r.source)}</span></td>
+                <!-- 来源（带浅蓝色背景标签） -->
+                <td>
+                    <span style="background: #e6f7ff; padding: 2px 8px; border-radius: 4px;">
+                        ${escapeHtml(r.source)}
+                    </span>
+                </td>
+                <!-- 数据类型 -->
                 <td>${escapeHtml(r.dataType)}</td>
-                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(r.dataContent)}</td>
-                <td><span style="background: #f6ffed; color: #52c41a; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${escapeHtml(r.status)}</span></td>
+                <!-- 数据内容（限制宽度，超长显示省略号） -->
+                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${escapeHtml(r.dataContent)}
+                </td>
+                <!-- 状态（带绿色背景标签） -->
+                <td>
+                    <span style="background: #f6ffed; color: #52c41a; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+                        ${escapeHtml(r.status)}
+                    </span>
+                </td>
+                <!-- 接收时间（后端的 LocalDateTime 会带 T，替换成空格更易读） -->
                 <td>${r.createdAt ? r.createdAt.replace('T', ' ') : ''}</td>
             </tr>
         `).join('');
     }
 
+    // ===== HTML 转义 =====
+
+    /**
+     * 防止 XSS 攻击：把特殊字符转成 HTML 实体
+     * 例如 < 变成 &lt;，> 变成 &gt;
+     *
+     * @param text 原始文本
+     * @returns 转义后的安全文本
+     */
     function escapeHtml(text) {
         if (!text) return '';
+        // 利用浏览器 DOM API 做转义，比自己写正则更安全
         const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        div.textContent = text;         // 设置文本内容，浏览器自动转义
+        return div.innerHTML;           // 取回转义后的 HTML
     }
 
+    // ===== 右上角通知弹窗 =====
+
+    /**
+     * 在页面右上角弹出一个短暂的通知
+     *
+     * @param msg 通知内容
+     */
     function showToast(msg) {
         const toast = document.getElementById('toast');
+        // 设置内容：蓝色"新数据"标题 + 消息内容
         toast.innerHTML = '<strong style="color:#1890ff;">新数据</strong> &nbsp;' + escapeHtml(msg);
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
+        toast.classList.add('show');                    // 显示（通过 CSS 过渡动画）
+        setTimeout(() => toast.classList.remove('show'), 3000);  // 3秒后隐藏
     }
 
+    // ===== 加载历史数据 =====
+
+    /**
+     * 调用后端 API 加载已接收的数据，渲染到表格中
+     *
+     * async/await 是 JavaScript 的异步语法：
+     *   - await 会等待 fetch 请求完成
+     *   - 代码看起来像同步的，实际上不会阻塞浏览器
+     */
     async function loadData() {
         try {
+            // 发 GET 请求到 /api/remote-data
             const res = await fetch(DATA_URL);
+            // 解析响应的 JSON
             const json = await res.json();
+            // 如果响应码是 200，渲染数据
             if (json.code === 200) {
                 renderRows(json.data);
             }
         } catch (e) {
+            // 网络错误时在控制台打日志，不影响页面使用
             console.error('加载数据失败', e);
         }
     }
 
+    // ===== SSE 实时推送连接 =====
+
+    /**
+     * 连接 SSE 端点，实现实时数据推送
+     *
+     * EventSource 是浏览器内置 API，专门用来接收 SSE：
+     *   - 自动连接，断线自动重连
+     *   - 通过 addEventListener 监听指定事件名
+     *   - 收到事件后自动解析数据
+     */
     function connectSSE() {
+        // 获取连接状态显示元素
         const dot = document.getElementById('sseDot');
         const label = document.getElementById('sseLabel');
 
+        // 创建 EventSource 连接
         const es = new EventSource(SSE_URL);
 
+        // ----- 监听 "connected" 事件 -----
+        // 服务端 SSE 连接建立成功后，会发送这个事件
         es.addEventListener('connected', () => {
-            dot.className = 'sse-status online';
-            label.textContent = '已连接';
+            dot.className = 'sse-status online';   // 显示绿色圆点
+            label.textContent = '已连接';           // 显示"已连接"
         });
 
+        // ----- 监听 "new-data" 事件 -----
+        // 每次远端系统推送新数据时，服务端会发送这个事件
         es.addEventListener('new-data', (e) => {
+            // e.data 是服务端发来的 JSON 字符串，解析成对象
             const data = JSON.parse(e.data);
+            // 弹通知：来自 xxx 的 xxx 数据
             showToast('来自 ' + data.source + ' 的 ' + data.dataType + ' 数据');
+            // 重新加载整个表格（简单粗暴，数据量不大的时候没问题）
             loadData();
         });
 
+        // ----- 监听连接错误 -----
+        // 网络断开或服务端重启时触发，EventSource 会自动重连
         es.onerror = () => {
-            dot.className = 'sse-status offline';
-            label.textContent = '已断开，正在重连...';
+            dot.className = 'sse-status offline';   // 显示红色圆点
+            label.textContent = '已断开，正在重连...';  // 显示断连提示
         };
     }
 
-    loadData();
-    connectSSE();
+    // ===== 页面初始化 =====
+    // 页面一加载就执行：
+    //   1. 拉取历史数据
+    //   2. 建立 SSE 连接
+    loadData();     // 加载历史数据，展示在表格中
+    connectSSE();   // 建立 SSE 连接，准备接收实时推送
 </script>
+
 </body>
 </html>
