@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>远程数据实时看板</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; padding: 24px; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header h1 { font-size: 22px; }
+        .badge { background: #52c41a; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 12px; }
+        .table-wrap { background: #fff; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        th { background: #fafafa; font-weight: 600; color: #666; }
+        tr:hover { background: #fafafa; }
+        .sse-status { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        .sse-status.online { background: #52c41a; }
+        .sse-status.offline { background: #ff4d4f; }
+        .empty { text-align: center; padding: 60px 0; color: #999; }
+        .toast { position: fixed; top: 24px; right: 24px; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; padding: 12px 20px; font-size: 14px; border-left: 4px solid #1890ff; transition: all .3s; opacity: 0; transform: translateY(-10px); pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>远程数据实时看板</h1>
+            <div style="margin-top: 6px; font-size: 13px; color: #999;">
+                <span class="sse-status" id="sseDot"></span>
+                <span id="sseLabel">连接中...</span>
+                &nbsp;&nbsp;| 共 <strong id="totalCount">0</strong> 条记录
+            </div>
+        </div>
+        <button onclick="loadData()" style="padding: 6px 16px; border: 1px solid #d9d9d9; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;">刷新</button>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>来源</th>
+                    <th>数据类型</th>
+                    <th>数据内容</th>
+                    <th>状态</th>
+                    <th>接收时间</th>
+                </tr>
+            </thead>
+            <tbody id="dataBody">
+                <tr><td colspan="6" class="empty">加载中...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const DATA_URL = '/api/remote-data';
+    const SSE_URL = '/api/remote-data/subscribe';
+
+    let totalCount = 0;
+
+    function renderRows(records) {
+        const tbody = document.getElementById('dataBody');
+        if (!records || records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty">暂无数据</td></tr>';
+            document.getElementById('totalCount').textContent = '0';
+            return;
+        }
+        totalCount = records.length;
+        document.getElementById('totalCount').textContent = totalCount;
+        tbody.innerHTML = records.map(r => `
+            <tr>
+                <td>${r.id}</td>
+                <td><span style="background: #e6f7ff; padding: 2px 8px; border-radius: 4px;">${escapeHtml(r.source)}</span></td>
+                <td>${escapeHtml(r.dataType)}</td>
+                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(r.dataContent)}</td>
+                <td><span style="background: #f6ffed; color: #52c41a; padding: 2px 8px; border-radius: 4px; font-size: 12px;">${escapeHtml(r.status)}</span></td>
+                <td>${r.createdAt ? r.createdAt.replace('T', ' ') : ''}</td>
+            </tr>
+        `).join('');
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerHTML = '<strong style="color:#1890ff;">新数据</strong> &nbsp;' + escapeHtml(msg);
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    async function loadData() {
+        try {
+            const res = await fetch(DATA_URL);
+            const json = await res.json();
+            if (json.code === 200) {
+                renderRows(json.data);
+            }
+        } catch (e) {
+            console.error('加载数据失败', e);
+        }
+    }
+
+    function connectSSE() {
+        const dot = document.getElementById('sseDot');
+        const label = document.getElementById('sseLabel');
+
+        const es = new EventSource(SSE_URL);
+
+        es.addEventListener('connected', () => {
+            dot.className = 'sse-status online';
+            label.textContent = '已连接';
+        });
+
+        es.addEventListener('new-data', (e) => {
+            const data = JSON.parse(e.data);
+            showToast('来自 ' + data.source + ' 的 ' + data.dataType + ' 数据');
+            loadData();
+        });
+
+        es.onerror = () => {
+            dot.className = 'sse-status offline';
+            label.textContent = '已断开，正在重连...';
+        };
+    }
+
+    loadData();
+    connectSSE();
+</script>
+</body>
+</html>

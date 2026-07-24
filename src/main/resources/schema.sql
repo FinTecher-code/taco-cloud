@@ -43,3 +43,16 @@ CREATE TABLE IF NOT EXISTS article (
     INDEX idx_category (category_id),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章表';
+
+-- 远程推送数据记录表
+CREATE TABLE IF NOT EXISTS remote_data_record (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    source      VARCHAR(100) NOT NULL COMMENT '数据来源',
+    data_type   VARCHAR(50)  NOT NULL COMMENT '数据类型',
+    data_content TEXT        NOT NULL COMMENT '数据内容(JSON)',
+    status      VARCHAR(20)  NOT NULL DEFAULT 'RECEIVED' COMMENT '状态',
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_source (source),
+    INDEX idx_data_type (data_type),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='远程推送数据记录表';
