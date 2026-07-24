@@ -131,5 +131,4 @@ public class RemoteDataController {
         // 后续有数据推送时，会遍历这个列表给每个浏览器都发一份
         return remoteDataService.createSseEmitter();
     }
-
 }
