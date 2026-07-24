@@ -3,29 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - Blog Admin</title>
+    <title>Blog Admin</title>
     <link rel="stylesheet" href="/css/common.css">
+    <style>
+        .toggle-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #999;
+        }
+        .toggle-link a { cursor: pointer; }
+        .nickname-wrap { transition: all .3s; overflow: hidden; max-height: 0; opacity: 0; }
+        .nickname-wrap.show { max-height: 80px; opacity: 1; margin-bottom: 0; }
+    </style>
 </head>
 <body class="login-page">
     <div class="login-card">
         <h1>Blog Admin</h1>
-        <p class="subtitle">博客管理系统</p>
+        <p class="subtitle" id="formTitle">博客管理系统</p>
 
-        <div class="error-msg" id="errorMsg">用户名或密码错误</div>
+        <div class="error-msg" id="errorMsg"></div>
 
         <div class="form-group">
             <label for="username">用户名</label>
             <input type="text" id="username" class="form-input" placeholder="请输入用户名" autocomplete="username">
         </div>
 
-        <div class="form-group">
-            <label for="password">密码</label>
-            <input type="password" id="password" class="form-input" placeholder="请输入密码" autocomplete="current-password">
+        <div class="form-group nickname-wrap" id="nicknameWrap">
+            <label for="nickname">昵称（可选）</label>
+            <input type="text" id="nickname" class="form-input" placeholder="显示名称，不填默认用用户名">
         </div>
 
-        <button class="btn btn-primary" id="loginBtn" style="width:100%; padding:10px 0; font-size:16px; margin-top:8px;">
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" class="form-input" placeholder="密码至少6位" autocomplete="current-password">
+        </div>
+
+        <button class="btn btn-primary" id="submitBtn" style="width:100%; padding:10px 0; font-size:16px; margin-top:8px;">
             登 录
         </button>
+
+        <div class="toggle-link">
+            <span id="toggleText">没有账号？</span>
+            <a id="toggleBtn">去注册</a>
+        </div>
     </div>
 
     <script src="/js/common.js"></script>
@@ -36,12 +57,40 @@
         }
 
         const usernameInput = document.getElementById('username');
+        const nicknameInput = document.getElementById('nickname');
+        const nicknameWrap = document.getElementById('nicknameWrap');
         const passwordInput = document.getElementById('password');
-        const loginBtn = document.getElementById('loginBtn');
+        const submitBtn = document.getElementById('submitBtn');
         const errorMsg = document.getElementById('errorMsg');
+        const formTitle = document.getElementById('formTitle');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const toggleText = document.getElementById('toggleText');
 
-        /** 执行登录 */
-        async function doLogin() {
+        let isRegister = false;
+
+        /** 切换登录/注册模式 */
+        function toggleMode() {
+            isRegister = !isRegister;
+            if (isRegister) {
+                formTitle.textContent = '注册新账号';
+                submitBtn.textContent = '注 册';
+                toggleText.textContent = '已有账号？';
+                toggleBtn.textContent = '去登录';
+                nicknameWrap.classList.add('show');
+            } else {
+                formTitle.textContent = '博客管理系统';
+                submitBtn.textContent = '登 录';
+                toggleText.textContent = '没有账号？';
+                toggleBtn.textContent = '去注册';
+                nicknameWrap.classList.remove('show');
+            }
+            errorMsg.classList.remove('show');
+        }
+
+        toggleBtn.addEventListener('click', toggleMode);
+
+        /** 提交登录/注册 */
+        async function handleSubmit() {
             const username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
 
@@ -51,36 +100,54 @@
                 return;
             }
 
-            loginBtn.disabled = true;
-            loginBtn.textContent = '登录中...';
+            if (isRegister && password.length < 6) {
+                errorMsg.textContent = '密码至少6位';
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = isRegister ? '注册中...' : '登录中...';
             errorMsg.classList.remove('show');
 
             try {
-                const res = await apiPost('/api/users/login', { username, password });
+                let res;
+                if (isRegister) {
+                    res = await apiPost('/api/users/register', {
+                        username,
+                        password,
+                        nickname: nicknameInput.value.trim() || undefined,
+                    });
+                } else {
+                    res = await apiPost('/api/users/login', { username, password });
+                }
 
                 if (res.code === 200 && res.data) {
-                    // 登录成功，保存用户信息到 sessionStorage
-                    sessionStorage.setItem('currentUser', JSON.stringify(res.data));
-                    window.location.href = '/dashboard.html';
+                    if (isRegister) {
+                        showToast('注册成功，请登录', 'success');
+                        toggleMode();
+                        passwordInput.value = '';
+                    } else {
+                        sessionStorage.setItem('currentUser', JSON.stringify(res.data));
+                        window.location.href = '/dashboard.html';
+                    }
                 } else {
-                    errorMsg.textContent = res.message || '用户名或密码错误';
+                    errorMsg.textContent = res.message || '操作失败';
                     errorMsg.classList.add('show');
                 }
             } catch (e) {
                 errorMsg.textContent = '网络错误，请重试';
                 errorMsg.classList.add('show');
             } finally {
-                loginBtn.disabled = false;
-                loginBtn.textContent = '登 录';
+                submitBtn.disabled = false;
+                submitBtn.textContent = isRegister ? '注 册' : '登 录';
             }
         }
 
-        // 点击登录按钮
-        loginBtn.addEventListener('click', doLogin);
+        submitBtn.addEventListener('click', handleSubmit);
 
-        // 按回车键提交
         passwordInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') doLogin();
+            if (e.key === 'Enter') handleSubmit();
         });
         usernameInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') passwordInput.focus();
