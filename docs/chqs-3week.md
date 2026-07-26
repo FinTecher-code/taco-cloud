@@ -16,6 +16,11 @@
 | 8 | 消费者未提交 offset | Kafka 消费者 | ❌ |
 | 9 | 分区键映射描述 | Kafka 分区器 | ❌ |
 | 10 | 心跳参数描述 | Kafka 消费者 | ❌ |
+| 11 | Git vs SVN 区别 | Git | ❌ |
+| 12 | Git 生成 SSH 公钥步骤 | Git | ❌ |
+| 13 | git rebase --onto 用法 | Git | ❌ |
+| 14 | git merge vs rebase 优势 | Git | ❌ |
+| 15 | 纯本地 Git 操作 | Git | ✅ |
 
 ---
 
@@ -360,6 +365,7 @@ Git 和 SVN 的核心区别：
 1. 下载git → 安装 → cd ~ → mkdir .ssh → cd .ssh → 配置name/email → 生成key → 回车 ❌（我的答案）
 2. 下载git → 安装 → 配置name/email → mkdir .ssh → cd .ssh → cd ~ → 生成key → 回车
 3. 下载git → 安装 → 配置name/email → cd ~ → mkdir .ssh → cd .ssh → 生成key → 回车 ✅（正确答案）
+4. 下载git → 安装 → mkdir ~/.ssh → cd ~ → cd .ssh → 配置name/email → 生成key → 回车
 
 **我的答案:** 选项1 ❌
 **正确答案:** 选项3 ✅
@@ -376,7 +382,8 @@ Git 和 SVN 的核心区别：
 
 - **选项1** 把 `cd ~` → `mkdir .ssh` → `cd .ssh` 放在了配置 name/email **之前**，顺序不正确
 - **选项2** 在创建 `.ssh` 文件夹和进入目录后才 `cd ~` 回到主目录，逻辑错乱
-- **选项3** 是最合理的顺序：先配置 → `cd ~` 进主目录 → `mkdir .ssh` → `cd .ssh` → 生成密钥
+- **选项3 ✅** 是最合理的顺序：先配置 → `cd ~` 进主目录 → `mkdir .ssh` → `cd .ssh` → 生成密钥
+- **选项4** 用绝对路径创建 `.ssh` 再 `cd ~` 也能工作，但不如选项3自然
 
 **关键记忆:**
 > SSH 生成流程：**安装 → 配置 → cd ~ → mkdir .ssh → cd .ssh → ssh-keygen → 回车**
