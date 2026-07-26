@@ -379,3 +379,36 @@ Git 和 SVN 的核心区别：
 
 **关键记忆:**
 > SSH 生成流程：**安装 → 配置 → cd ~ → mkdir .ssh → cd .ssh → ssh-keygen → 回车**
+
+---
+
+### ❌ 13. Git rebase --onto 用法
+
+**题目:** 取出 client 分支，找出处于 client 分支和 server 分支的共同祖先之后的修改，然后把它们在 master 分支上重放一遍。以下哪个命令能达到上述效果？
+
+**选项:**
+1. `git rebase --onto master server client` ✅（正确答案）
+2. `git rebase --onto server client master`
+3. `git rebase --onto master client server` ❌（我的答案）
+4. `git rebase --onto client server master`
+
+**我的答案:** 选项3 ❌
+**正确答案:** 选项1 ✅
+
+**解析:**
+`git rebase --onto` 语法格式：
+
+> `git rebase --onto <新基线> <上游> <分支>`
+
+含义：检出 `<分支>`，找出其与 `<上游>` 的共同祖先之后的提交，将这些提交**重放（replay）**到 `<新基线>` 上。
+
+| 选项 | 解析 |
+|:----:|:----|
+| 1 ✅ | `--onto master`（目标基线）→ `server`（上游比较）→ `client`（被重放的分支）—— 取出 **client** 中比 server 多出的提交，放到 **master** 上 ✅ |
+| 2 | `--onto server` → `client` → `master` —— 把 **master** 中比 client 多出的提交放到 **server** 上 |
+| 3 ❌ | `--onto master` → `client` → `server` —— 把 **server** 中比 client 多出的提交放到 **master** 上 ❌（不是 client） |
+| 4 | `--onto client` → `server` → `master` —— 把 **master** 中比 server 多出的提交放到 **client** 上 |
+
+**关键记忆:**
+> `rebase --onto A B C` = 把 C 分支中超出 B 的提交重放到 A 上
+> 三个参数顺序：**目标 → 上游 → 分支**
