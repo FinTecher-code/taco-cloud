@@ -331,12 +331,12 @@ Git 和 SVN 的核心区别：
 **题目:** Git 生成 ssh 公钥的正确步骤是？
 
 **选项:**
-1. 下载git → 安装 → cd ~ → mkdir .ssh → cd .ssh → 配置name/email → 生成key → 回车 ❌（我的答案）
+1. 下载git → 安装 → mkdir ~/.ssh → cd ~ → cd .ssh → 配置name/email → 生成key → 回车
 2. 下载git → 安装 → 配置name/email → mkdir .ssh → cd .ssh → cd ~ → 生成key → 回车
 3. 下载git → 安装 → 配置name/email → cd ~ → mkdir .ssh → cd .ssh → 生成key → 回车 ✅（正确答案）
-4. 下载git → 安装 → mkdir ~/.ssh → cd ~ → cd .ssh → 配置name/email → 生成key → 回车
+4. 下载git → 安装 → cd ~ → mkdir .ssh → cd .ssh → 配置name/email → 生成key → 回车 ❌（我的答案）
 
-**我的答案:** 选项1 ❌
+**我的答案:** 选项4 ❌
 **正确答案:** 选项3 ✅
 
 **解析:**
@@ -349,10 +349,10 @@ Git 和 SVN 的核心区别：
 6. `ssh-keygen -t rsa -b 4096 -C "email"` 生成密钥
 7. 回车确认默认路径，可选设置密码
 
-- **选项1** 把 `cd ~` → `mkdir .ssh` → `cd .ssh` 放在了配置 name/email **之前**，顺序不正确
+- **选项1** 先创建 `.ssh` 再 `cd ~` 然后 `cd .ssh`，用绝对路径创建可以工作但顺序别扭
 - **选项2** 在创建 `.ssh` 文件夹和进入目录后才 `cd ~` 回到主目录，逻辑错乱
 - **选项3 ✅** 是最合理的顺序：先配置 → `cd ~` 进主目录 → `mkdir .ssh` → `cd .ssh` → 生成密钥
-- **选项4** 用绝对路径创建 `.ssh` 再 `cd ~` 也能工作，但不如选项3自然
+- **选项4 ❌** 把 `cd ~` → `mkdir .ssh` → `cd .ssh` 放在了配置 name/email **之前**，顺序不正确
 
 **关键记忆:**
 > SSH 生成流程：**安装 → 配置 → cd ~ → mkdir .ssh → cd .ssh → ssh-keygen → 回车**
