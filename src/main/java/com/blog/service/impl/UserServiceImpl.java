@@ -10,6 +10,7 @@ import com.blog.service.UserService;
 import org.springframework.stereotype.Service;
 
 @Service
+// ServiceImpl<UserMapper, User> UserMapper代表操作方法，User代表操作对象
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
     @Override
@@ -24,7 +25,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword()); // V1 明文，后续升级加密
         user.setNickname(request.getNickname() != null ? request.getNickname() : request.getUsername());
-        save(user);
+        save(user); // 继承UserMapper的save方法
         return user;
     }
 
