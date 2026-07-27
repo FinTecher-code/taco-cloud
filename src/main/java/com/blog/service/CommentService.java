@@ -7,14 +7,10 @@ import com.blog.entity.Comment;
 import java.util.List;
 
 public interface CommentService extends IService<Comment> {
-    /**
-     * 按文章查看评论
-     */
-    List<Comment> pageByArticle(Long articleId);
 
-    /**
-     * 按照id删除
-     */
-    void deleteById(int deleted);
+    IPage<Comment> page(int pageNum, int pageSize, Long articleId);
+
+    Comment addComment(Long articleId, String nickname, String content);
+
+    void removeComment(Long id);
 }
-
