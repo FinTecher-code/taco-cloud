@@ -73,22 +73,52 @@
 
 ---
 
-## 2026-07-30
+## 2026-07-28
 
 ---
 
-### 题目：
+### Q4 — 给已有表添加主键约束
 
-**选项：**
-1.
-2.
-3.
-4.
+**来源:** 每日一练 App
 
-**我的答案：**
-**正确答案：**
+**题目:** `ALTER TABLE tbl_name ADD PRIMARY KEY (column_list)` 的功能是？
 
-**解析：**
+**选项:**
+1. 创建一个主键，不能为空不能重复
+2. 创建一个主键，能为空不能重复
+3. 创建一个主键，不能为空能重复
+4. 创建一个索引主键，不能为空不可重复 ✅
+
+**我的答案:** 选项4 ✅
+**正确答案:** 选项4
+
+**解析:**
+- `ALTER TABLE ... ADD PRIMARY KEY` 用于给已存在的表添加主键约束
+- 主键特性：**非空（NOT NULL）+ 唯一（UNIQUE）**
+- MySQL 会自动为主键创建一个**索引主键**（clustered index）
+- 选项4 准确描述了主键的全部特性：索引主键、不能为空、不可重复
+
+
+### Q5 — MyISAM 全文索引查询优化
+
+**来源:** 每日一练 App
+
+**题目:** MyISAM 表 user（字段 id, name, email），name 和 email 均已建全文索引，最有效查询关键词的写法是？
+
+**选项:**
+1. `select id,name from user where name like '%关键词%' or email like '%关键词%';`
+2. `select id,name from user where match(name,email) against('关键词' in Boolean mode);` ✅
+3. `select id,name from user where match(name) against('关键词' in Boolean mode) or match(email) against('关键词' in Boolean mode);`
+4. `select id,name from user where match(name) against('关键词' in Boolean mode) union select id,name from user where match(email) against('关键词' in Boolean mode);`
+
+**我的答案:** 选项2 ✅
+**正确答案:** 选项2
+
+**解析:**
+- `LIKE '%关键词%'` 无法走索引，大表性能差
+- 选项2 使用**联合全文索引** `MATCH(name, email)`，一次检索两列，效率最高
+- 选项3、4 虽然也用了全文索引，但需要拆成两次检索
+- MyISAM 支持全文索引，`IN BOOLEAN MODE` 支持布尔运算符
 
 ---
 
@@ -97,5 +127,5 @@
 | 日期 | 题数 | 答对 | 答错 |
 |:----:|:----:|:----:|:----:|
 | 07-27 | 3 | 3 | 0 |
-| 07-30 | 0 | 0 | 0 |
-| **合计** | **3** | **3** | **0** |
+| 07-28 | 2 | 2 | 0 |
+| **合计** | **5** | **5** | **0** |
