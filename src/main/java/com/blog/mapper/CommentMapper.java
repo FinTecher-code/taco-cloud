@@ -10,22 +10,23 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface CommentMapper extends BaseMapper<Comment> {
-
     @Select("""
-            SELECT c.*, a.title AS article_title
-            FROM comment c
-            LEFT JOIN article a ON c.article_id = a.id
-            WHERE c.deleted = 0
-            ORDER BY c.created_at DESC
-            """)
+select c.*,a.title AS article_title
+    from comment c\s
+    left join article a on c.article_id = a.id\s
+    where c.deleted = 0\s
+            order by c.created_at desc
+
+""")
     IPage<Comment> selectPageWithArticle(Page<?> page);
 
     @Select("""
-            SELECT c.*, a.title AS article_title
-            FROM comment c
-            LEFT JOIN article a ON c.article_id = a.id
-            WHERE c.deleted = 0 AND c.article_id = #{articleId}
-            ORDER BY c.created_at DESC
-            """)
+select c.*,a.title as article_title
+from comment c 
+left join article a on c.article_id = a.id 
+where c.deleted = 0 and c.article_id = #{articleId}
+order by c.created_at desc
+"""
+    )
     IPage<Comment> selectPageByArticle(Page<?> page, @Param("articleId") Long articleId);
 }

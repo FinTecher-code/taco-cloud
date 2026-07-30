@@ -21,8 +21,6 @@ public class Comment {
     @TableLogic
     private Integer deleted;
 
-    // ---------- 非数据库字段（用于联表查询） ----------
-
     @TableField(exist = false)
     private String articleTitle;
 }

@@ -9,6 +9,8 @@ import com.blog.service.CommentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
 
@@ -21,7 +23,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     public IPage<Comment> page(int pageNum, int pageSize, Long articleId) {
         Page<Comment> page = new Page<>(pageNum, pageSize);
-        if (articleId != null) {
+        if (articleId == null) {
             return commentMapper.selectPageByArticle(page, articleId);
         }
         return commentMapper.selectPageWithArticle(page);
@@ -39,7 +41,6 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     }
 
     @Override
-    @Transactional
     public void removeComment(Long id) {
         removeById(id);
     }

@@ -56,14 +56,3 @@ CREATE TABLE IF NOT EXISTS remote_data_record (
     INDEX idx_data_type (data_type),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='远程推送数据记录表';
-
--- 评论表
-CREATE TABLE IF NOT EXISTS comment (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    article_id  BIGINT       NOT NULL COMMENT '关联的文章ID',
-    nickname    VARCHAR(50)  NOT NULL COMMENT '评论者昵称',
-    content     TEXT         NOT NULL COMMENT '评论内容',
-    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    deleted     TINYINT      NOT NULL DEFAULT 0 COMMENT '逻辑删除',
-    INDEX idx_article (article_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章评论表';
