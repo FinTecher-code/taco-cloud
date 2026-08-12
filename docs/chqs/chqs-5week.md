@@ -366,7 +366,7 @@
 **题目:** 以下 SQL 语句创建的是哪种类型的表？
 
 ```sql
-CREATE TABLE t (... a varchar(10), KEY a_key (a) USING HASH GLOBAL);
+CREATE TABLE t1(a int, b varchar(10), KEY a_key(a) USING HASH GLOBAL);
 ```
 
 **选项:**
