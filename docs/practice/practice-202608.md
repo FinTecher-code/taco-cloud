@@ -86,29 +86,30 @@ public class Solution {
 #### Python 实现
 
 ```python
-def reverse_vowels(s: str) -> str:
-    arr = list(s)
-    left, right = 0, len(arr) - 1
+import sys
+
+def reverse_vowels(s):
     vowels = set("aeiouAEIOU")
+    chars = list(s)
+    left, right = 0, len(chars) - 1
 
     while left < right:
-        while left < right and arr[left] not in vowels:
+        while left < right and chars[left] not in vowels:
             left += 1
-        while left < right and arr[right] not in vowels:
+        while left < right and chars[right] not in vowels:
             right -= 1
-        arr[left], arr[right] = arr[right], arr[left]
+
+        chars[left], chars[right] = chars[right], chars[left]
         left += 1
         right -= 1
 
-    return "".join(arr)
+    return "".join(chars)
 
-
-# 测试
-if __name__ == "__main__":
-    print(reverse_vowels("hello"))  # holle
-    print(reverse_vowels("leeo"))   # loee
-    print(reverse_vowels("xyz"))    # xyz
+if __name__ == '__main__':
+    print(reverse_vowels(sys.argv[1]))
 ```
+
+> 在线平台版：输入通过 `sys.argv[1]` 传入，结果用 `print` 输出，兼容 Python 3.7。
 
 ---
 
