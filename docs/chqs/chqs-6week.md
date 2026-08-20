@@ -146,9 +146,101 @@
 
 ---
 
+## 2026-08-14
+
+---
+
+### Q6 — Maven Site 生命周期阶段
+
+**来源:** 每日一练 App
+
+**题目:** Maven site 周期的主要阶段包括？
+
+**选项:**
+1. site 产生项目的站点文档、install 将构件部署到本地仓库
+2. install 将构件部署到本地仓库、site-deploy 将项目的站点文档部署到服务器
+3. site-deploy 将项目的站点文档部署到服务器、deploy 部署构件到远程仓库 ❌
+4. site 产生项目的站点文档、site-deploy 将项目的站点文档部署到服务器 ✅
+
+**我的答案:** 选项3 ❌
+**正确答案:** 选项4 ✅
+
+**解析:**
+- Maven 的 **Site 生命周期**只有两个阶段：`site` → `site-deploy`
+  - **site**：产生项目的站点文档（生成项目报告、API 文档等静态网站）✅
+  - **site-deploy**：将生成的站点文档部署到服务器 ✅
+- 易混点：`install` 和 `deploy` 属于 **Default（构建）生命周期**，不属于 Site 生命周期
+  - **install**：把构件部署到本地仓库（`~/.m2/repository`）
+  - **deploy**：把构件部署到远程仓库（如 Nexus/中央仓库）
+- 用户选了选项3，把 site-deploy（部署站点文档）和 deploy（部署构件）混在一起——deploy 是 Default 生命周期的阶段，不是 Site 周期的
+- 记忆点：Site 两兄弟 = site / site-deploy（都跟"站点文档"相关）；install/deploy 是 Default 周期的构件部署，别混进来
+
+---
+
+---
+
+### Q7 — Maven 打包方式
+
+**来源:** 每日一练 App
+
+**题目:** 关于 Maven 打包方式说法错误的是？
+
+**选项:**
+1. war：该资源打成 war 包，默认是 war ✅
+2. jar：该资源打成 jar 包，默认是 jar
+3. war：该资源打成 war 包
+4. pom：该资源是一个父资源（表明使用 maven 分模块管理），打包时只生成一个 pom.xml，不生成 jar 或其他包结构 ❌
+
+**我的答案:** 选项4 ❌
+**正确答案:** 选项1 ✅
+
+**解析:**
+- 题目问"说法**错误**的是"，答案是选项1：war 打成 war 包没错，但 **Maven 的默认打包方式是 jar**，不是 war
+  - 也就是说，如果一个项目没显式声明 `<packaging>`，Maven 默认按 jar 打包
+- 其余三个选项都正确：
+  - **jar**：打成 jar 包，默认就是 jar ✅
+  - **war**：打成 war 包 ✅（只是说能打成 war，没说 war 是默认值）
+  - **pom**：父工程/聚合工程，只生成 pom.xml，不产出 jar 等包结构 ✅
+- 易混点：`<packaging>` 的默认值是 **jar**，这一点最容易考；war 需要显式写 `<packaging>war</packaging>` 才会打成 war 包
+- 记忆点：Maven 默认打包 = jar；war 要手动指定；pom = 父工程只出 pom.xml
+
+---
+
+---
+
+### Q8 — 打包时跳过测试
+
+**来源:** 每日一练 App
+
+**题目:** 如何在打包时跳过测试环境？
+
+**选项:**
+1. `mvn clean package`
+2. `mvn clean package -Dmaven.test.skip=true` ✅
+3. `mvn clean package -Dmaven.test.skip=false` ❌
+4. `mvn package`
+
+**我的答案:** 选项3 ❌
+**正确答案:** 选项2 ✅
+
+**解析:**
+- 跳过测试的关键参数是 `-Dmaven.test.skip=true`，其中 **skip=true 才是跳过**
+  - `mvn clean package -Dmaven.test.skip=true`：打包时跳过测试编译和测试执行 ✅
+- 选项3 是 `skip=false`，含义是**不跳过测试**，与题目要求正好相反 ❌
+- 选项1 `mvn clean package` 和选项4 `mvn package` 都会执行测试，没跳过
+- 易混点：还有一个 `-DskipTests` 参数
+  - `-Dmaven.test.skip=true`：跳过测试的**编译**和**运行**
+  - `-DskipTests`：只跳过测试**运行**，但仍会编译测试代码
+- 记忆点：skip 后面跟 `true` 才是跳过；`skipTests` 只跳运行不跳编译
+
+---
+
+---
+
 ## 📊 第六周错题汇总
 
 | 日期 | 题数 | 答对 | 答错 |
 |:----:|:----:|:----:|:----:|
 | 08-12 | 5 | 3 | 2 |
-| **合计** | **5** | **3** | **2** |
+| 08-14 | 3 | 0 | 3 |
+| **合计** | **8** | **3** | **5** |
