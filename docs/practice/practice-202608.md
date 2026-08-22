@@ -330,18 +330,15 @@ if __name__ == '__main__':
 
 ---
 
-#### SQL 实现（推荐：EXISTS 版，不会产生重复行）
+#### SQL 实现（推荐：DISTINCT + JOIN 版）
 
 ```sql
 -- 查询需要删除的记录 id（升序）
-select t1.id
+select distinct t1.id
 from tb_user_score t1
-where exists (
-  select 1
-  from tb_user_score t2
-  where t2.score = t1.score
-    and t2.id < t1.id
-)
+join tb_user_score t2
+  on t1.score = t2.score
+ and t2.id < t1.id
 order by t1.id;
 
 -- 执行删除（多表 DELETE 即使匹配多行也只删一次）
