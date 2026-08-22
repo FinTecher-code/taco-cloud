@@ -280,3 +280,99 @@ if __name__ == '__main__':
 | 用 `Set` 去重编号 | 同一金额下的重复编号（如 34 出现两次）只算一次 |
 | 金额之间的字母会断开记录 | `126am456` 中 `126` 与 `m` 被 `a` 隔开，不是有效记录，不应计入 |
 | 边界：至少一条记录 | 题意保证至少一条有效记录，但代码仍对 `groups` 为空做了保护 |
+
+---
+
+## 08-22
+
+### 题目 1：删除重复分数记录（SQL）
+
+**题目描述：**
+
+`tb_user_score` 是一个学生成绩记录表：
+
+| 列名 | 数据类型 | 说明 |
+|------|----------|------|
+| id | INT | 自增 ID |
+| uid | INT | 用户 ID |
+| score | DATETIME | 分数 |
+| created_at | timestamp | 创建时间 |
+
+老师需要删除重复的分数，重复的分数只保留 id 最小的那条记录。请帮老师找出需要删除的记录 id，结果按 id 升序排列。
+
+**测试用例：**
+
+测试用例 1：分数 40、20 重复，id 3<5、4<6，所以应删除的 id 为 5 和 6。
+
+表数据（7 条记录）：
+
+| id | uid | score | created_at |
+|----|-----|-------|------------|
+| 1 | 1 | 30 | 2022-10-10 00:00:00 |
+| 2 | 1 | 35 | 2022-10-10 00:00:00 |
+| 3 | 1 | 40 | 2022-10-10 00:00:00 |
+| 4 | 1 | 20 | 2022-10-10 00:00:00 |
+| 5 | 2 | 40 | 2022-10-10 00:00:00 |
+| 6 | 2 | 20 | 2022-10-10 00:00:00 |
+| 7 | 2 | 39 | 2022-10-10 00:00:00 |
+
+输出：`5`、`6`
+
+测试用例 2：输出 `4`、`6`
+
+---
+
+#### 解题思路
+
+1. **判重键是 `score`，与 `uid` 无关**：本题目中“重复的分数”指分数值出现多次，即使不同 uid 的同分记录也算重复（测试用例 1 中 id 3 与 id 5 分属不同 uid，但 id 5 仍被删除）。
+2. **保留 id 最小**：对每组重复分数，只保留 id 最小的记录，其余删除。
+3. **找“该删的记录”**：一条记录需要删除 ⇔ 存在同分且 id 更小的记录。用自连接 / EXISTS / 窗口函数实现。
+
+---
+
+#### SQL 实现（推荐：EXISTS 版，不会产生重复行）
+
+```sql
+-- 查询需要删除的记录 id（升序）
+select t1.id
+from tb_user_score t1
+where exists (
+  select 1
+  from tb_user_score t2
+  where t2.score = t1.score
+    and t2.id < t1.id
+)
+order by t1.id;
+
+-- 执行删除（多表 DELETE 即使匹配多行也只删一次）
+delete t1
+from tb_user_score t1
+join tb_user_score t2
+  on t1.score = t2.score
+ and t2.id < t1.id;
+```
+
+#### SQL 实现（MySQL 8.0+ 窗口函数版）
+
+```sql
+select id
+from (
+  select id,
+         row_number() over (partition by score order by id) as rn
+  from tb_user_score
+) t
+where rn > 1
+order by id;
+```
+
+---
+
+#### 易错点
+
+| 注意 | 说明 |
+|------|------|
+| 判重键是 score 不是 (uid, score) | 题目中不同 uid 的同分也算重复，若按 uid+score 判重，测试用例 1 结果为空、答案错误 |
+| JOIN 写法会产生重复行 | 同一分数出现 3 次及以上时（如 id 2、4、6 同分），id 6 会匹配到两个更小 id，输出两行 6 → 判题失败。用 EXISTS / DISTINCT / 窗口函数解决 |
+| WHERE 不能引用聚合结果 | 过滤分组后的 count 要用 HAVING，不是 WHERE |
+| 非相关子查询无意义 | `where (select count(id) from tb_user_score group by score) > 1` 报错 Subquery returns more than 1 row，且与外层行无关联 |
+| 删前先查后删 | 先用 SELECT 确认结果再执行 DELETE，删完复查 |
