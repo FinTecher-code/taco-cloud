@@ -373,3 +373,95 @@ order by id;
 | WHERE 不能引用聚合结果 | 过滤分组后的 count 要用 HAVING，不是 WHERE |
 | 非相关子查询无意义 | `where (select count(id) from tb_user_score group by score) > 1` 报错 Subquery returns more than 1 row，且与外层行无关联 |
 | 删前先查后删 | 先用 SELECT 确认结果再执行 DELETE，删完复查 |
+
+---
+
+### 题目 2：通配符模式匹配
+
+**题目描述：**
+
+实现一个支持 `?` 和 `*` 的通配符匹配函数 `is_match(s, p)`，其中：
+- `?` 匹配任意单个字符
+- `*` 匹配任意字符序列（包括空序列）
+- 匹配应覆盖整个输入字符串
+- 不使用内置正则表达式库
+
+**输入：**
+- 输入字符串 `s` 长度 0~20
+- 模式 `p` 长度 0~30
+
+**输出：**
+- 返回 `true` / `false` 表示是否匹配
+
+**示例：**
+
+```
+输入: s="adceb", p="*a*b"
+输出: true
+```
+解析：第一个 `*` 匹配空序列，`a` 匹配 `a`，第二个 `*` 匹配 `"dceb"`
+
+**测试用例：**
+
+| # | 输入 | 输出 |
+|---|------|------|
+| 1 | `adceb;*a*b` | `true` |
+| 2 | `acdcb;a*c?b` | `false` |
+
+---
+
+#### 解题思路
+
+动态规划：
+- `dp[i][j]` 表示 `s` 的前 i 个字符能否被 `p` 的前 j 个字符匹配
+- 初始化：`dp[0][0] = True`；模式串开头的连续 `*` 可以匹配空串，`dp[0][j] = True`
+- 状态转移：
+  - `p[j-1] == '*'`：`dp[i][j] = dp[i-1][j] or dp[i][j-1]`（`*` 匹配一个字符，或匹配空/跳过）
+  - `p[j-1] == '?'` 或 `p[j-1] == s[i-1]`：`dp[i][j] = dp[i-1][j-1]`
+- 答案：`dp[m][n]`
+
+时间复杂度 O(m×n)，空间复杂度 O(m×n)。
+
+---
+
+#### Python 实现
+
+```python
+import sys
+
+def is_match(s: str, p: str) -> bool:
+    # 编码区
+    m, n = len(s), len(p)
+    dp = [[False] * (n + 1) for _ in range(m + 1)]
+    dp[0][0] = True
+    # 初始化：模式串开头的 * 可以匹配空串
+    for j in range(1, n + 1):
+        if p[j - 1] == '*':
+            dp[0][j] = True
+        else:
+            break
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if p[j - 1] == '*':
+                dp[i][j] = dp[i - 1][j] or dp[i][j - 1]
+            elif p[j - 1] == '?' or p[j - 1] == s[i - 1]:
+                dp[i][j] = dp[i - 1][j - 1]
+    return dp[m][n]
+
+
+if __name__ == '__main__':
+    s, p = sys.argv[1].split(';')
+    print(is_match(s, p), end='')
+```
+
+---
+
+#### 易错点
+
+| 注意 | 说明 |
+|------|------|
+| 状态转移方向 | `dp[i-1][j]` 表示 `*` 匹配一个字符（从上往下），`dp[i][j-1]` 表示 `*` 匹配空串（从左往右），缺一不可 |
+| 开头 `*` 的初始化 | 模式串以 `*` 开头时（如 `*a*b`）第一行必须提前置 True，否则空串匹配被忽略 |
+| `?` 与普通字符分支 | `?` 和字符相等都走 `dp[i-1][j-1]`，但 `?` 不要求字符相等 |
+| 覆盖整个字符串 | 返回 `dp[m][n]`，不是任意子串匹配 |
+| 输入解析 | `sys.argv[1].split(';')` 得到 s 和 p，`print(..., end='')` 无换行输出 |
