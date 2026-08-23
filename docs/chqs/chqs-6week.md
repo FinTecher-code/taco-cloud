@@ -282,10 +282,55 @@
 **题目:** 需要通过文件的存在或者缺失激活配置文件，如何设置 pom？
 
 **选项:**
-1. `<profile><id>test</id><activation><file><missing>...</missing></file></activation></profile>` ✅
-2. `<profile><groupId>test</groupId><activation><file><missing>...</missing></file></activation></profile>`
-3. `<profile><groupId>test</groupId><activations><file><missing>...</missing></file></activations></profile>`
-4. `<profile><groupId>test</groupId><activations><activation><file><missing>...</missing></file></activation></activations></profile>`
+1.
+```xml
+<profile>
+ <id>test</id>
+ <activation>
+ <file>
+ <missing>target/generated-sources/axistools/wsdl2java/
+ com/companyname/group</missing>
+ </file>
+ </activation>
+</profile>
+```
+✅
+2.
+```xml
+<profile>
+ <groupId>test</groupId>
+ <activation>
+ <file>
+ <missing>target/generated-sources/axistools/wsdl2java/
+ com/companyname/group</missing>
+ </file>
+ </activation>
+</profile>
+```
+3.
+```xml
+<profile>
+ <groupId>test</groupId>
+ <activations>
+ <file>
+ <missing>target/generated-sources/axistools/wsdl2java/
+ com/companyname/group</missing>
+ </file>
+ </activations>
+</profile>
+```
+4.
+```xml
+<profile>
+ <groupId>test</groupId>
+ <activations>
+ <activation>
+ <missing>target/generated-sources/axistools/wsdl2java/
+ com/companyname/group</missing>
+ </activation>
+ </activations>
+</profile>
+```
 
 **我的答案:** 选项4 ❌
 **正确答案:** 选项1 ✅
