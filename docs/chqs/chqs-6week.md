@@ -237,10 +237,97 @@
 
 ---
 
+## 2026-08-23
+
+---
+
+### Q9 — Maven 使用阿里云仓库
+
+**来源:** 每日一练 App
+
+**题目:** Maven 如何使用阿里云（Aliyun）仓库？
+
+**选项:**
+1. settings.xml 配 `<mirrors><mirror>`（带 `mirrorOf>central`），pom.xml 配 `<repositories><repository>`（带 releases/snapshots 开关）✅
+2. settings.xml 配 `<repositories><repository>`（带 `mirrorOf>central`），pom.xml 配 `<repositories><repository>`（带 releases/snapshots 开关）
+3. settings.xml 配 `<repositories><repository>`（带 `mirrorOf>central`），pom.xml 配 `<mirrors><mirror>`（带 releases/snapshots 开关）
+4. 其他选项均正确 ❌
+
+**我的答案:** 选项4 ❌
+**正确答案:** 选项1 ✅
+
+**解析:**
+
+阿里云仓库配置的核心是**两个文件、两种标签，位置不能搞混**：
+
+- **settings.xml（全局，Maven 根目录 conf/ 下）**：配**镜像**用 `<mirrors><mirror>`，通过 `mirrorOf` 指定镜像哪个仓库（`central` = 只镜像中央仓库，`*` = 镜像所有仓库）
+- **pom.xml（项目级）**：配**仓库**用 `<repositories><repository>`，可加 `<releases>/<snapshots>` 开关控制是否拉取正式版/快照版
+
+逐项分析：
+- **选项1**：settings.xml 用 mirrors ✅ + pom.xml 用 repositories ✅ → **两处都正确**
+- **选项2**：settings.xml 错用 `<repositories>`（镜像应该用 `<mirrors>`，且 repository 里没有 `mirrorOf` 这个子元素）❌；pom.xml 部分正确 → 整体错
+- **选项3**：settings.xml 错用 `<repositories>` ❌，pom.xml 又错用 `<mirrors>`（pom.xml 里没有 mirrors 配置，releases/snapshots 也不是 mirror 的子元素）❌ → 全错
+- **选项4**：选这个的坑在于——题目问的是哪种配置**正确**，但选项2、3都有硬伤，所以"其他选项均正确"不成立 ❌
+
+**记忆点:** settings.xml = `<mirrors>` 镜像（mirrorOf 指定范围）；pom.xml = `<repositories>` 仓库（releases/snapshots 开关）；**mirror 进 settings，repository 进 pom，两者别串**
+
+---
+
+---
+
+### Q10 — Maven 文件激活 Profile
+
+**来源:** 每日一练 App
+
+**题目:** 需要通过文件的存在或者缺失激活配置文件，如何设置 pom？
+
+**选项:**
+1. `<profile><id>test</id><activation><file><missing>...</missing></file></activation></profile>` ✅
+2. `<profile><groupId>test</groupId><activation><file><missing>...</missing></file></activation></profile>`
+3. `<profile><groupId>test</groupId><activations><file><missing>...</missing></file></activations></profile>`
+4. `<profile><groupId>test</groupId><activations><activation><file><missing>...</missing></file></activation></activations></profile>`
+
+**我的答案:** 选项4 ❌
+**正确答案:** 选项1 ✅
+
+**解析:**
+
+Maven 通过文件激活 profile 的标准结构：
+
+```xml
+<profile>
+  <id>test</id>
+  <activation>
+    <file>
+      <missing>target/generated-sources/.../com/companyname/group</missing>
+    </file>
+  </activation>
+</profile>
+```
+
+关键点：
+- **标识符是 `<id>`**：profile 通过 `id` 唯一标识，`<groupId>` 是项目的坐标元素，profile 里**没有** groupId ❌
+- **激活标签是 `<activation>`（单数）**：`<activations>` 复数不存在，Maven 不认识 ❌
+- `<file>` 下有 `<exists>`（文件存在时激活）和 `<missing>`（文件缺失时激活）两种触发条件，本题用的是 `<missing>`
+- 本题的激活条件：当 `target/generated-sources/axistools/wsdl2java/com/companyname/group` 这个文件/目录**不存在**时，激活 `test` profile
+
+逐项分析：
+- **选项1**：id + activation(单数) + file/missing → 全部正确 ✅
+- **选项2**：错用 `<groupId>`（应为 `<id>`）❌
+- **选项3**：`<groupId>` ❌ + `<activations>` 复数 ❌ → 两处错
+- **选项4**：`<groupId>` ❌ + `<activations>` 复数外壳 ❌（里面虽是 activation，但外层不合法）→ 错
+
+**记忆点:** profile 用 `<id>` 命名、`<activation>` 单数激活；文件触发看 `<file><exists>/<missing>`；出现 groupId 或 activations 就直接排除
+
+---
+
+---
+
 ## 📊 第六周错题汇总
 
 | 日期 | 题数 | 答对 | 答错 |
 |:----:|:----:|:----:|:----:|
 | 08-12 | 5 | 3 | 2 |
 | 08-14 | 3 | 0 | 3 |
-| **合计** | **8** | **3** | **5** |
+| 08-23 | 2 | 0 | 2 |
+| **合计** | **10** | **3** | **7** |
