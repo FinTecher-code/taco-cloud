@@ -451,7 +451,7 @@ def is_match(s: str, p: str) -> bool:
 
 if __name__ == '__main__':
     s, p = sys.argv[1].split(';')
-    print(is_match(s, p), end='')
+    print(str(is_match(s, p)).lower(), end='')
 ```
 
 ---
@@ -464,4 +464,4 @@ if __name__ == '__main__':
 | 开头 `*` 的初始化 | 模式串以 `*` 开头时（如 `*a*b`）第一行必须提前置 True，否则空串匹配被忽略 |
 | `?` 与普通字符分支 | `?` 和字符相等都走 `dp[i-1][j-1]`，但 `?` 不要求字符相等 |
 | 覆盖整个字符串 | 返回 `dp[m][n]`，不是任意子串匹配 |
-| 输入解析 | `sys.argv[1].split(';')` 得到 s 和 p，`print(..., end='')` 无换行输出 |
+| 输入解析 | `sys.argv[1].split(';')` 得到 s 和 p，`print(str(is_match(s, p)).lower(), end='')` 输出小写 true/false 且无换行 |
