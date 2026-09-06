@@ -412,21 +412,21 @@ public class RetryConfiguration {
 **题目:** Spring Cloud Gateway的作用是
 
 **选项:**
-A. 作为服务的注册中心提供服务的注册、发现与配置的功能
-B. 为各种环境下运行的服务的外部配置提供一个统一的管理中心 ❌
-C. 旨在为微服务架构提供一种简单有效的统一的 API 路由管理方式 ✅
-D. 通过轻量消息代理连接各个分布的节点，可用来广播状态的变化或者其他的消息指令
+1. 作为服务的注册中心提供服务的注册、发现与配置的功能
+2. 为各种环境下运行的服务的外部配置提供一个统一的管理中心 ❌
+3. 旨在为微服务架构提供一种简单有效的统一的 API 路由管理方式 ✅
+4. 通过轻量消息代理连接各个分布的节点，可用来广播状态的变化或者其他的消息指令
 
-**我的答案:** 选项B ❌
-**正确答案:** 选项C ✅
+**我的答案:** 选项2 ❌
+**正确答案:** 选项3 ✅
 
 **解析:**
-- 选项C 正确：**Spring Cloud Gateway = API 网关**，核心职责是**统一的 API 路由管理**——基于 Spring WebFlux（响应式）实现，通过 Route（路由）+ Predicate（断言）+ Filter（过滤器）把请求按规则转发到下游微服务，同时可做**统一鉴权、限流、日志、跨域**等横切处理 ✅
-- 用户选选项B 的误区：把 Gateway 当成**配置中心**了——**“外部配置统一管理”是 Spring Cloud Config（配置中心）的职责**，配套组件是 Config Server/Client，跟 Gateway 无关 ❌
+- 选项3 正确：**Spring Cloud Gateway = API 网关**，核心职责是**统一的 API 路由管理**——基于 Spring WebFlux（响应式）实现，通过 Route（路由）+ Predicate（断言）+ Filter（过滤器）把请求按规则转发到下游微服务，同时可做**统一鉴权、限流、日志、跨域**等横切处理 ✅
+- 用户选选项2 的误区：把 Gateway 当成**配置中心**了——**“外部配置统一管理”是 Spring Cloud Config（配置中心）的职责**，配套组件是 Config Server/Client，跟 Gateway 无关 ❌
 - 逐个排除：
-  - 选项A：服务注册/发现是 **Eureka / Consul / Nacos** 的活；配置功能是 Config 的活——这是把“注册中心+配置中心”混合描述，不是 Gateway ❌
-  - 选项B：**Spring Cloud Config** 的职责（统一外部配置管理），不是 Gateway ❌
-  - 选项D：**“轻量消息代理广播状态变化”是 Spring Cloud Bus** 的职责（配合 Config 做配置动态刷新，基于 MQ）❌
+  - 选项1：服务注册/发现是 **Eureka / Consul / Nacos** 的活；配置功能是 Config 的活——这是把“注册中心+配置中心”混合描述，不是 Gateway ❌
+  - 选项2：**Spring Cloud Config** 的职责（统一外部配置管理），不是 Gateway ❌
+  - 选项4：**“轻量消息代理广播状态变化”是 Spring Cloud Bus** 的职责（配合 Config 做配置动态刷新，基于 MQ）❌
 - 组件职责全家桶记忆：
   - **Gateway** = 统一 API 路由/网关
   - **Config** = 外部配置统一管理
