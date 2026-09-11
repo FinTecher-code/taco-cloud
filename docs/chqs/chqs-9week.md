@@ -322,3 +322,27 @@
 - 选项2 ✅（能废弃）：`invalidate()` 直接使整个 Session 失效——标准做法
 - 选项3 ✅（能废弃）：`logOut()` 注销用户并废弃与其关联的会话（如 Servlet 3.0 的 HttpServletRequest.logout）
 - 记忆点：**服务端 Session 的生命周期由服务端管理**（超时/invalidate/logout），关闭浏览器只丢客户端的会话标识，服务端数据还在
+---
+
+### Q14 — 数据安全：SQL 版本号更新采用的锁机制
+
+**来源:** 每日一练 App
+**分类:** 数据安全
+
+**题目:** 客户端与服务端交互过程中更新数据时，采用以下 SQL 更新语句：`update table set column = value and table.version = table.version+1 where table.id=xxx and table.version=2`，其中 `table.id` 为主键，`table.version` 为版本字段。问：该实现采用的是什么机制？
+
+**选项:**
+1. 数据库乐观锁
+2. 数据库悲观锁
+3. 数据库行锁
+4. 数据库表锁
+
+**我的答案:** 选项3 ❌
+**正确答案:** 选项1 ✅
+
+**解析:**
+- 该 SQL 是**乐观锁**的教科书写法：`WHERE table.version=2` 先比对版本号（CAS 思想），`SET table.version=table.version+1` 更新时递增版本；若更新影响行数为 0，说明版本已被其他事务修改，需重试
+- 选项3 ❌（我选的）：行锁是数据库**自动**的行级锁定机制（如 InnoDB 默认对索引行加锁），与"手动比对版本号"的乐观锁是两回事
+- 选项2 ❌：悲观锁的典型实现是 `SELECT ... FOR UPDATE`，先锁定再操作
+- 选项4 ❌：表锁是对整张表加锁，粒度最大、并发最差
+- 记忆点：**版本号比对 + 版本递增 = 乐观锁**；`FOR UPDATE` = 悲观锁；行锁/表锁是数据库自身的锁粒度
