@@ -249,3 +249,28 @@
 - 选项3 ✅（适合，我误选）：需要算法不同变体、以类层次实现变体——策略模式的核心适用场景，**它其实是适合的**，只是不符合题目"不适合"的要求
 - 选项4 ✅（适合）：算法使用客户不应知道的数据、避免暴露复杂数据结构——策略模式封装算法细节的适用场景
 - 记忆点：**"通知多个对象且解耦" → 观察者模式**，不是策略；策略模式的关键词是"行为/算法变体、可替换、配置"
+---
+
+### Q11 — Java：不属于线程安全的容器
+
+**来源:** 每日一练 App
+**分类:** 数据安全（JAVA开发）
+
+**题目:** 1. 使用JAVA开发，以下不属于线程安全的容器的是？
+
+**选项:**
+1. ConcurrentHashMap
+2. ArrayList
+3. LinkedBlockingDeque
+4. Vector
+
+**我的答案:** 选项4 ❌
+**正确答案:** 选项2 ✅
+
+**解析:**
+- 题目问"**不属于**线程安全的容器"，只有 ArrayList 是线程不安全的，故为答案
+- 选项1 ConcurrentHashMap ✅（线程安全）：JDK 1.5+ 的并发容器，采用分段锁/CAS+Synchronized 保证高并发安全
+- 选项2 ArrayList ❌（我该选）：底层数组，**没有任何同步机制**，多线程并发读写会数据错乱（应使用 CopyOnWriteArrayList 或 Collections.synchronizedList）
+- 选项3 LinkedBlockingDeque ✅（线程安全）：阻塞双端队列，内部用锁保证线程安全
+- 选项4 Vector ✅（线程安全，我误选）：**老牌同步容器**，所有方法用 synchronized 修饰——它是线程安全的，只是性能差，已被 ArrayList + 并发工具替代
+- 记忆点：**Vector=线程安全（同步方法）、ArrayList=线程不安全**；看到"不属于/不正确"先圈关键词；并发场景用 ConcurrentHashMap / CopyOnWriteArrayList
