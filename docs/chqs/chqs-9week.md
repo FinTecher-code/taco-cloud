@@ -346,3 +346,27 @@
 - 选项2 ❌：悲观锁的典型实现是 `SELECT ... FOR UPDATE`，先锁定再操作
 - 选项4 ❌：表锁是对整张表加锁，粒度最大、并发最差
 - 记忆点：**版本号比对 + 版本递增 = 乐观锁**；`FOR UPDATE` = 悲观锁；行锁/表锁是数据库自身的锁粒度
+---
+
+### Q15 — 数据安全：下列哪个是线程安全的容器
+
+**来源:** 每日一练 App
+**分类:** 数据安全
+
+**题目:** 5. 下列哪个是线程安全的容器？
+
+**选项:**
+1. java.util.Vector
+2. java.util.ArrayList
+3. java.util.LinkedList
+4. java.util.HashSet
+
+**我的答案:** 选项4 ❌
+**正确答案:** 选项1 ✅
+
+**解析:**
+- **Vector 是线程安全的**：老牌同步容器，内部方法用 `synchronized` 修饰，多线程环境下安全（代价是性能较低，已被 ArrayList + 并发工具替代）
+- 选项4 ❌（我选的）：HashSet 底层是 HashMap，**没有任何同步机制**，线程不安全（并发场景用 `Collections.synchronizedSet` 或 `ConcurrentHashMap.newKeySet()`）
+- 选项2 ❌：ArrayList 底层数组，无同步，线程不安全（可用 CopyOnWriteArrayList）
+- 选项3 ❌：LinkedList 双向链表，无同步，线程不安全（可用 ConcurrentLinkedQueue / LinkedBlockingDeque）
+- 记忆点：**Vector、Hashtable、Stack 是老牌线程安全类**（全部方法 synchronized）；ArrayList/LinkedList/HashSet/HashMap 均线程不安全
