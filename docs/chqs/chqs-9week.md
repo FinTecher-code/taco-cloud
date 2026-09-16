@@ -329,7 +329,7 @@
 **来源:** 每日一练 App
 **分类:** 数据安全
 
-**题目:** 客户端与服务端交互过程中更新数据时，采用以下 SQL 更新语句：`update table set column = value and table.version = table.version+1 where table.id=xxx and table.version=2`，其中 `table.id` 为主键，`table.version` 为版本字段。问：该实现采用的是什么机制？
+**题目:** 客户端与服务端交互过程中更新数据时，采用以下 SQL 更新语句：`update table set column = value, table.version = table.version+1 where table.id=xxx and table.version=2`，其中 `table.id` 为主键，`table.version` 为版本字段。问：该实现采用的是什么机制？
 
 **选项:**
 1. 数据库乐观锁
