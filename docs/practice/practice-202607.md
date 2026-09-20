@@ -228,5 +228,5 @@ left join book_publishers bp on b.book_id = bp.book_id
 left join publishers p on bp.publisher_id = p.publisher_id
 left join borrow_records br on b.book_id = br.book_id
 group by b.book_id, b.title, b.author, p.name
-order by borrow_count desc;
+order by total_borrows desc;
 ```
