@@ -222,7 +222,7 @@ select
     b.title,
     b.author,
     p.name as publisher_name,
-    count(br.record_id) as borrow_count
+    count(br.record_id) as total_borrows
 from books b
 left join book_publishers bp on b.book_id = bp.book_id
 left join publishers p on bp.publisher_id = p.publisher_id
