@@ -32,85 +32,24 @@
 ```
 解析：统计 c:3, a:3 → 频率相同，按 ASCII 码升序 a(97) < c(99)，a 在前 → aaaccc
 
----
-
-#### 解题思路
-
-**统计 + 排序 + 拼接** 三步：
-1. **统计频率**：ASCII 可打印字符范围固定，用长度为 256 的数组 `freq` 计数（比 HashMap 更简洁高效）
-2. **排序**：收集出现过的字符，按「频率降序，频率相同按 ASCII 升序」排序（Comparator：先比频率 `freq[b] - freq[a]`，相同再比字符 `a - b`）
-3. **拼接**：遍历排序后的字符列表，每个字符重复其频率次数拼到 StringBuilder
-
-时间复杂度 O(n + k log k)（n 为字符串长度，k 为不同字符数，k ≤ 256 可视为常数，近似 O(n)），空间复杂度 O(k)。
-
----
-
-#### Java 实现
-
-```java
-import java.util.ArrayList;
-import java.util.List;
-
-public class Solution {
-    public String frequencySort(String s) {
-        // 1. 统计每个字符出现次数（可打印 ASCII 字符 0-255）
-        int[] freq = new int[256];
-        for (char c : s.toCharArray()) {
-            freq[c]++;
-        }
-
-        // 2. 收集出现过的字符，按（频率降序，ASCII 升序）排序
-        List<Character> chars = new ArrayList<>();
-        for (int i = 0; i < 256; i++) {
-            if (freq[i] > 0) {
-                chars.add((char) i);
-            }
-        }
-        chars.sort((a, b) -> {
-            if (freq[a] != freq[b]) {
-                return freq[b] - freq[a]; // 频率降序
-            }
-            return a - b;                  // 频率相同，ASCII 升序
-        });
-
-        // 3. 按频率拼接
-        StringBuilder sb = new StringBuilder();
-        for (char c : chars) {
-            for (int i = 0; i < freq[c]; i++) {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
-    }
-
-    // 测试
-    public static void main(String[] args) {
-        Solution sol = new Solution();
-        System.out.println(sol.frequencySort("tree"));    // eert
-        System.out.println(sol.frequencySort("cccaaa"));  // aaaccc
-        System.out.println(sol.frequencySort("Aabb"));    // bbAa（b 频率 2 > A/a 频率 1，ASCII 升序 A(65) < a(97)）
-    }
-}
-```
-
----
-
-#### Python 实现
-
+**Python 代码：**
 ```python
+import sys
 from collections import Counter
 
-def frequencySort(s: str) -> str:
-    # 1. 统计频率
+# ===== 请在下方填空实现函数 =====
+def frequencySort(s):
     freq = Counter(s)
-    # 2. 按（频率降序，ASCII 升序）排序
     chars = sorted(freq.keys(), key=lambda c: (-freq[c], ord(c)))
-    # 3. 拼接
     return ''.join(c * freq[c] for c in chars)
+# ==============================
 
-# 测试
-print(frequencySort("tree"))    # eert
-print(frequencySort("cccaaa"))  # aaaccc
+# 以下为固定的已知代码，仅获取参数并调用业务函数
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python frequency_sort.py <STRING>")
+        sys.exit(1)
+    print(frequencySort(sys.argv[1]))
 ```
 
 ---
@@ -138,124 +77,36 @@ print(frequencySort("cccaaa"))  # aaaccc
 输入: aa     → 输出: -（两字符相同，无法严格更大）
 ```
 
----
-
-#### 解题思路（Next Permutation 经典三步）
-
-1. **从右往左找第一个升序对** `s[i] < s[i+1]` 的位置 `i`（即从右数第一个"不降"的拐点）
-   - 若找不到（整个字符串从左到右降序），说明已是最大排列，返回 `-`
-2. **从右往左找第一个大于 `s[i]` 的字符** `s[j]`，交换 `s[i]` 与 `s[j]`
-   - 交换后，`i` 右边的部分仍是降序（字典序最大段）
-3. **反转 `i+1` 到末尾**，把降序段变成升序，得到最小后缀 → 拼接即答案
-
-**为什么正确：**
-- 找拐点：字典序下一个排列必须"从右数第一个能变大的位置"变
-- 交换最小的更大字符：保证增量最小
-- 反转尾部：保证尾部是升序（最小），整体才是"最小的更大排列"
-
-时间复杂度 O(n)，空间复杂度 O(n)（char 数组）。字符串长度 ≤ 1000，完全没问题。
-
----
-
-#### Java 实现
-
-```java
-public class Solution {
-    public String nextPermutation(String s) {
-        char[] arr = s.toCharArray();
-        int n = arr.length;
-
-        // 1. 从右往左找第一个 arr[i] < arr[i+1] 的位置
-        int i = n - 2;
-        while (i >= 0 && arr[i] >= arr[i + 1]) {
-            i--;
-        }
-
-        // 2. 整个序列降序（或长度1），已是最大排列
-        if (i < 0) {
-            return "-";
-        }
-
-        // 3. 从右往左找第一个大于 arr[i] 的字符
-        int j = n - 1;
-        while (arr[j] <= arr[i]) {
-            j--;
-        }
-
-        // 4. 交换
-        char tmp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = tmp;
-
-        // 5. 反转 i+1 到末尾（降序→升序，保证后缀最小）
-        reverse(arr, i + 1, n - 1);
-
-        return new String(arr);
-    }
-
-    private void reverse(char[] arr, int l, int r) {
-        while (l < r) {
-            char tmp = arr[l];
-            arr[l] = arr[r];
-            arr[r] = tmp;
-            l++;
-            r--;
-        }
-    }
-
-    // 测试
-    public static void main(String[] args) {
-        Solution sol = new Solution();
-        System.out.println(sol.nextPermutation("12345"));  // 12354
-        System.out.println(sol.nextPermutation("54321"));  // -
-        System.out.println(sol.nextPermutation("aa"));     // -
-        System.out.println(sol.nextPermutation("abc"));    // acb
-        System.out.println(sol.nextPermutation("aab"));    // aba
-        System.out.println(sol.nextPermutation("132"));    // 213
-        System.out.println(sol.nextPermutation("21543"));  // 23145
-    }
-}
-```
-
----
-
-#### Python 实现
-
+**Python 代码：**
 ```python
-def nextPermutation(s: str) -> str:
+import sys
+
+# ===== 请在下方填空实现函数 =====
+def nextPermutation(s):
     arr = list(s)
     n = len(arr)
-
     # 1. 从右往左找第一个 arr[i] < arr[i+1]
     i = n - 2
     while i >= 0 and arr[i] >= arr[i + 1]:
         i -= 1
-
-    # 2. 已是最降序（最大排列）
     if i < 0:
         return "-"
-
-    # 3. 从右往左找第一个大于 arr[i] 的字符
+    # 2. 从右往左找第一个大于 arr[i] 的字符并交换
     j = n - 1
     while arr[j] <= arr[i]:
         j -= 1
-
-    # 4. 交换
     arr[i], arr[j] = arr[j], arr[i]
-
-    # 5. 反转尾部（降序→升序）
-    arr[i+1:] = reversed(arr[i+1:])
-
+    # 3. 反转尾部（降序→升序，保证后缀最小）
+    arr[i + 1:] = reversed(arr[i + 1:])
     return ''.join(arr)
+# ==============================
 
-# 测试
-print(nextPermutation("12345"))  # 12354
-print(nextPermutation("54321"))  # -
-print(nextPermutation("aa"))     # -
-print(nextPermutation("abc"))    # acb
-print(nextPermutation("aab"))    # aba
-print(nextPermutation("132"))    # 213
-print(nextPermutation("21543"))  # 23145
+# 以下为固定的已知代码，请勿修改
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python next_perm.py <S>")
+        sys.exit(1)
+    print(nextPermutation(sys.argv[1]))
 ```
 
 ---
