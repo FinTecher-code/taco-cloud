@@ -40,13 +40,14 @@ if __name__ == '__main__':
     chars = list(s)
     left, right = 0, len(chars) - 1
     while left < right:
-        while left < right and chars[left] not in vowels:
+        if chars[left] not in vowels:
             left += 1
-        while left < right and chars[right] not in vowels:
+        elif chars[right] not in vowels:
             right -= 1
-        chars[left], chars[right] = chars[right], chars[left]
-        left += 1
-        right -= 1
+        else:
+            chars[left], chars[right] = chars[right], chars[left]
+            left += 1
+            right -= 1
     print("".join(chars))
 ```
 
