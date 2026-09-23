@@ -248,30 +248,40 @@
 
 ---
 
-**题目:** 执行下面的反射代码，输出结果是什么？（完整题目）
+### Q12 — 反射机制
 
-**解析:**
-- 示例代码：
-  ```java
-  public class Person {
-      public String name;
-      private int age;
-      public Person(String name, int age) { ... }
-      private void hello() { ... }
-  }
-  ```
-  ```java
-  Class<?> cls = Class.forName("Person");
-  Constructor<?> constructor = cls.getDeclaredConstructor(String.class, int.class);
-  constructor.setAccessible(true);
-  Object obj = constructor.newInstance("Alice", 25);
+**来源:** 每日一练 App
 
-  Field field = cls.getDeclaredField("age");
-  field.setInt(obj, -1);                      // ← 这里抛异常
+**题目:** 执行下面的反射代码，输出结果是什么？
 
-  Method method = cls.getDeclaredMethod("hello");
-  method.invoke(obj);
-  ```
+```java
+public class Person {
+    public String name;
+    private int age;
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+    private void hello() {
+        System.out.println("Hello, " + this.name + "!");
+    }
+}
+```
+
+```java
+public class Test {
+    public static void main(String[] args) throws Exception {
+        Class<?> cls = Class.forName("Person");
+        Constructor<?> constructor = cls.getDeclaredConstructor(String.class, int.class);
+        constructor.setAccessible(true);
+        Object obj = constructor.newInstance("Alice", 25);
+        Field field = cls.getDeclaredField("age");
+        field.setInt(obj, -1);
+        Method method = cls.getDeclaredMethod("hello");
+        method.invoke(obj);
+    }
+}
+```
 
 **选项:**
 1. `age` 是私有字段导致编译错误
