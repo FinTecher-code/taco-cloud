@@ -248,11 +248,7 @@
 
 ---
 
-### Q12 — 反射机制
-
-**来源:** 每日一练 App
-
-**题目:** 执行下面的反射代码，输出结果是什么？
+**题目:** 执行下面的反射代码，输出结果是什么？（完整题目）
 
 **解析:**
 - 示例代码：
@@ -278,16 +274,19 @@
   ```
 
 **选项:**
-1. `age` 是私有字段导致编译错误 ✅
+1. `age` 是私有字段导致编译错误
 2. `hello()` 是私有方法导致编译错误
 3. 设置负值导致运行时异常
 4. 未设置 Field/Method 可访问导致运行时异常
 
-**我的答案:** `age` 是私有字段导致编译错误 ✅
-**正确答案:** `age` 是私有字段导致编译错误
+**我的答案:** 选项1 ❌
+**正确答案:** 选项4 ✅
 
 **解析:**
-- 关键陷阱：`constructor.setAccessible(true)` **只对构造器生效**，不会自动传给 Field 和 Method。`field` 没有单独调 `setAccessible(true)`，运行时抛 `IllegalAccessException`
+- 反射代码编译期不检查私有访问，1、2 的"编译错误"都是干扰项
+- 关键陷阱：`constructor.setAccessible(true)` **只对构造器生效**，不会传给后续的 Field 和 Method
+- `field.setInt(obj, -1)` 时 field 没调 `setAccessible(true)`，从外部类反射访问 Person 私有字段 age → 运行时抛 `IllegalAccessException`，输出前就中断
+- 即使 field 能过，`method.invoke(obj)` 调私有方法 hello() 也会因同样原因抛异常（method 也没 setAccessible）
 
 ---
 
