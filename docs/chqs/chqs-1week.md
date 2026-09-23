@@ -229,11 +229,13 @@
 **题目:** 关于 CountDownLatch 和 CyclicBarrier 的说法正确的是？
 
 **选项:**
-1. CountDownLatch：等 countDown 到 0，释放后各走各路；不可重用
-2. CyclicBarrier：N 个线程互相等待，全部到齐统一走；可通过 `reset()` 重置重用
+1. CountDownLatch 用于等待所有线程完成，而 CyclicBarrier 用于等待某个条件达到
+2. CountDownLatch 用于等待某个条件达到，而 CyclicBarrier 用于等待所有线程完成
+3. CountDownLatch 可以重复使用，而 CyclicBarrier 只能使用一次
+4. CountDownLatch 允许线程在达到某个点后继续执行不同任务，而 CyclicBarrier 则让一组线程在某个点相互等待
 
-**我的答案:** 本题原文件未提供明确用户选项，无法确定
-**正确答案:** （见下方解析对比表）
+**我的答案:** 选项1 ❌
+**正确答案:** 选项4 ✅
 
 **解析:**
 - CountDownLatch — 等 countDown 到 0，释放后各走各路；一次性，不可重用
