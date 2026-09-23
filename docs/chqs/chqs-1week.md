@@ -357,6 +357,25 @@ public class Test {
 
 ---
 
+### Q15 — Arrays.sort 数组排序
+
+**来源:** 每日一练 App
+
+**题目:** 以下代码执行后，数组 x 中的元素值依次是？
+
+```java
+int[] x = {12, 35, 8, 7, 2};
+Arrays.sort(x);
+```
+
+**正确答案:** `2, 7, 8, 12, 35`（升序）
+
+**解析:**
+- `Arrays.sort(int[])` 对基本类型数组做**升序**排序
+- 注意：基本类型版本没有 Comparator 重载，想降序要用 `Integer[]` + `Comparator.reverseOrder()`
+
+---
+
 ## 📊 第一周错题汇总
 
 | 日期 | 题数 | 答对 | 答错 |
