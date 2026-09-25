@@ -273,27 +273,24 @@ SCARD cd
 
 ### Q10 — MyBatis Resources 加载配置
 
-**来源:** 每日一练 App
+**来源:** 每日一练 App + 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 使用 `Resources` 类的哪个方法从 classpath 加载 `mybatis-config.xml` 来构建 `SqlSessionFactory`？
+**题目:** 在构建SqlSessionFactory时，如果配置文件mybatis-config.xml位于类路径下，使用Resources类加载该文件的正确方式是？
 
 **选项:**
-1. `getResourceAsStream` ✅
-2. `loadResource` ❌（我选的）
-3. `openResource`
-4. `readResource`
+1. `Resources.getResourceAsStream("mybatis-config.xml")` ✅
+2. `Resources.loadResource("mybatis-config.xml")`
+3. `Resources.openResource("mybatis-config.xml")`
+4. `Resources.readResource("mybatis-config.xml")`
 
-**我的答案:** `loadResource` ❌
-**正确答案:** `Resources.getResourceAsStream()`
+**我的答案:** 选项2 ❌
+
+**正确答案:** 选项1
 
 **解析:**
-- MyBatis 的 `org.apache.ibatis.io.Resources` 工具类，从 classpath 加载资源用的是 **`getResourceAsStream()`**
-- 用法：`Resources.getResourceAsStream("mybatis-config.xml")`
-- `loadResource`、`openResource`、`readResource` 都不是 Resources 类的方法
-
----
-
-## 2026-07-19
+- **官方解析（Excel）:** Resources 类是 MyBatis 提供的用于加载类路径下资源的工具类，`getResourceAsStream()` 方法可以将类路径下的资源文件以输入流的形式返回，方便将配置文件传递给 SqlSessionFactoryBuilder 的 build() 方法
+- `loadResource`、`openResource`、`readResource` 都不是 Resources 类中用于获取类路径资源输入流的正确方法
+- **深度补充:** `org.apache.ibatis.io.Resources` 的核心 API 就是 `getResourceAsStream(String resource)`，内部基于类加载器查找 classpath 资源
 
 ---
 
