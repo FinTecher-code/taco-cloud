@@ -196,25 +196,28 @@ SCARD cd
 
 ### Q7 — Tomcat Connector 与 Container 交互
 
-**来源:** 每日一练 App
+**来源:** 每日一练 App + 新版题库 Excel（2026-09-25 同步）
 
-**题目:** Tomcat 中 Connector 和 Container 是怎样交互的？
+**题目:** Tomcat Connector 和 Container 交互的方式是什么？
 
 **选项:**
-1. Engine
-2. Host
-3. Server ✅
-4. Connector
+1. Connector 直接将请求交给 Context 处理
+2. Connector 通过 Engine 传递请求给 Host
+3. Connector 解析 HTTP 请求后，将其交给 Engine 处理 ✅
+4. Container 解析请求后，传递给 Connector 进行处理
 
 **我的答案:** 选项3 ✅
-**正确答案:** 选项3（Server）
+
+**正确答案:** 选项3
 
 **解析:**
-- **Connector** 负责接收并**解析 HTTP 请求**，将其封装为 `Request`/`Response` 对象
-- 解析后交给 **Container 容器顶层（Engine）** 处理
-- Engine → Host → Context → Wrapper 逐级向下分发
-- Connector 不直接跟 Context 打交道，Container 也不干解析的活
-  解析：正确答案：Server  正确选项解析：  *Server 是正确答案。Server是Tomcat架构中的顶级组件，代表整个Tomcat实例。它负责管理一个或多个Service组件，并提供了Tomcat的启动、停止等生命周期管理功能。  错误选项解析：  *Engine是Service的子组件，负责处理请求并管理多个Host，但它不管理整个Tomcat实例。  *Host是Engine的子组件，代表一个虚拟主机，用于部署和管理Web应用程序，但它不管理整个Tomcat实例。  *Connector是Service的子组件，负责处理特定协议（如HTTP/HTTPS）的请求，但它不管理整个Tomcat实例。
+- **官方解析（Excel）:** Connector 解析 HTTP 请求后，将其封装成 Request，然后交给 Engine，Engine 进一步分发给 Host → Context → Servlet
+- 错误项分析：
+  - “直接交给 Context” —— 请求需先经 Engine 和 Host 才到 Context
+  - “通过 Engine 传递给 Host” —— 表述不准确，Engine 只是容器组件，请求分发由 Connector 完成后进入 Engine
+  - “Container 解析后传给 Connector” —— 相反，Container 负责请求分发处理，不解析 HTTP
+- **深度补充:** Connector 负责接收并解析 HTTP 请求，封装为 Request/Response 对象；Container 内部分发链路为 Engine → Host → Context → Wrapper，逐级向下
+- 记忆点：**Connector 管连接解析，Container 管容器分发**；Connector 的下一站永远是 **Engine**
 
 ---
 
