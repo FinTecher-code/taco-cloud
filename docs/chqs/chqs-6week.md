@@ -268,7 +268,7 @@ d、`mvn -show-version`
 **题目:** Maven 如何使用阿里云（Aliyun）仓库？
 
 **选项:**
-1. 
+1. ✅ **正确写法 — 区别点: settings.xml 里用的是 `<mirrors>` + `<mirrorOf>central</mirrorOf>`（镜像专属标签）**
   修改 maven 根目录下的 conf 文件夹中的 settings.xml 文件：  
   ```  
   <mirrors>  
@@ -296,7 +296,7 @@ d、`mvn -show-version`
           </repository>    
   </repositories>  
   ``` ✅
-2. 
+2. ❌ **区别点: settings.xml 里错用了 `<repositories>` —— settings.xml 配镜像必须用 `<mirrors>`，且 `<repository>` 里根本没有 `mirrorOf` 这个子元素**
   修改 maven 根目录下的 conf 文件夹中的 settings.xml 文件：  
   ```  
   <repositories>  
@@ -324,7 +324,7 @@ d、`mvn -show-version`
           </repository>    
   </repositories>  
   ```
-3. 
+3. ❌ **区别点: 两边都写反了 — settings.xml 用了 `<repositories>`（错，应为 `<mirrors>`），pom.xml 里又用了 `<mirrors>`（错，pom 里只放 `<repositories>`）**
   修改 maven 根目录下的 conf 文件夹中的 settings.xml 文件：  
   ```  
   <repositories>  
@@ -352,7 +352,7 @@ d、`mvn -show-version`
           </mirror>    
   </mirrors>  
   ```
-4. 其他选项均正确
+4. ❌ 其他选项均正确（不成立：选项2、3 的标签都用错了位置）
 
 **我的答案:** 选项4 ❌
 **正确答案:** 选项1（修改 maven 根目录下的 conf 文件夹中的 settings.xml 文）
