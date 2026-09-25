@@ -53,8 +53,6 @@
   - 线程安全容器三兄弟的锁机制：**HashTable = synchronized 全表锁**｜**ConcurrentHashMap = 分段锁/CAS**｜**CopyOnWrite 系列 = 写时复制**
   - 区分“用 synchronized 的”和“不用 synchronized 的”：Vector/HashTable 是 synchronized；ConcurrentHashMap 早期靠分段锁（Segment 本身是 ReentrantLock），JDK1.8 用 CAS+synchronized，都不是简单的方法级锁
 
-
-- 📌 Excel 题库同步（2026-09-25，内容校对一致）：
   解析：CopyOnWriteArraySet和CopyOnWriteArrayList是基于写时复制保证线程安全；HashTable是基于synchronized保证线程安全；ConcurrentHashMap是基于ReentrantLock+CAS+分段思想来保证的并发安全的。
 ### Q3 — 对称密码算法的适用性（加密）
 
@@ -80,8 +78,6 @@
 - ✗ 选项4 错：对称加密**不能直接用于数字签名**（签名要用非对称私钥）
 - 记忆点：**对称 = 快 → 加密数据本体；非对称 = 慢 → 加密会话密钥/签名**；实际方案常为混合加密（非对称协商密钥 + 对称加密数据）
 
-
-- 📌 Excel 题库同步（2026-09-25，答案已校正）：
   解析：由于对称秘密算法比非对称密码算法效率高，所以特别适合于对数据进行加解密。
 ### Q4 — Session 生命周期描述错误的选项
 
@@ -108,8 +104,6 @@
   - **Session 是“一人一份”**，靠 Cookie 里的 JSESSIONID 标识（URL 重写是兜底方案）
   - Session 默认放内存 → 快但重启丢失；集群部署要解决 Session 共享（粘性会话 / Redis 集中存储）
 
-
-- 📌 Excel 题库同步（2026-09-25，答案已校正）：
   解析：为了获得更高的存取速度，服务器一般把Session放在内存里。每个用户都会有一个独立的Session。
 ### Q5 — SSH 支持的认证方式（不属于的选项）
 
@@ -136,11 +130,10 @@
 
 ## 2026-09-16
 
-
-- 📌 Excel 题库同步（2026-09-25，内容校对一致）：
   解析：SSH支持多种认证方式:用户密码、公钥认证、CA等。可以单独使用一种认证方式，也可以多种认证方式共同使用。
 
 ---
+
 ### Q1 — getSession() 方法的描述（选错误的）
 
 **来源:** 每日一练 App（岛屿主页在线答题）

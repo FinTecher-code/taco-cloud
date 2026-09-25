@@ -29,11 +29,10 @@
 - 选项4 错误：存储过程里如果还是**拼接动态 SQL**（EXEC 拼字符串），注入风险依然存在；正确做法是存储过程**内部也使用参数化绑定**
 - 记忆点：防注入首选 = 预编译 + 绑定变量；前端过滤是纸糊的盾（可绕过）；动态拼接 SQL 到哪里都是坑
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：为修复SQL注入漏洞，开发人员建议采取的方法是：使用预编译语句，绑定变量  解释如下：  - 选项：在前端代码中对输入参数进行过滤 - 虽然前端过滤可以减少一些简单的攻击，但它不是一种安全的做法，因为攻击者可能会绕过前端验证直接向服务器发送请求。 - 选项：删除所有涉及数据库操作的代码 - 这显然不是一个合理的解决方案，因为数据库操作是大多数应用程序的核心功能。 - 选项：使用预编译语句，绑定变量 - 这是防止SQL注入的最佳实践之一。预编译语句（也称为参数化查询）可以确保输入的参数不会被解释为SQL代码的一部分，从而有效地防止SQL注入攻击。 - 选项：使用存储过程时使用动态的SQL语句 - 使用动态SQL语句会增加SQL注入的风险，即使是存储过程也不例外。因此，这不是推荐的修复方法。  因此，使用预编译语句并绑定变量是修复SQL注入漏洞的正确方法。
 
 ---
+
 ### Q2 — 搜索框注入恶意代码导致重定向
 
 **来源:** 每日一练 App
@@ -59,11 +58,10 @@
   - **CSRF（跨站请求伪造）**：是**冒用已登录用户的身份**去伪造请求（如改密码、转账），不是往页面注入脚本，也不会重定向用户 ❌ —— 用户选这个是典型误判：看到“恶意网站/重定向”想到了攻击者引导用户，但 CSRF 的本质是“借刀”，XSS 的本质是“种脚本”
 - 记忆点：往页面/搜索框**注入脚本** → 优先 XSS（重定向、偷 Cookie、弹窗都是它的活儿）；CSRF = 冒用身份发请求；SQL 注入 = 打数据库；命令注入 = 打系统命令
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：用户在搜索时被重定向到了一个恶意网站，说明攻击者成功将恶意代码注入到了搜索框中。此处存在的是跨站脚本攻击（XSS）漏洞，攻击者通过在搜索框中注入恶意脚本，使得用户在搜索时被重定向到了攻击者指定的网站。SQL注入漏洞、CSRF漏洞和命令注入漏洞均不符合此情况。
 
 ---
+
 ### Q3 — 路径遍历（文件写入校验逻辑反转）
 
 **来源:** 每日一练 App
@@ -99,11 +97,10 @@ if (!fileName.startsWith("/img/")) {
 - 排除其他选项：**JSON注入**针对 JSON 解析/序列化，本题无关；**硬编码用户名**是凭据管理问题；**XSS**是往页面注入脚本，均与文件路径无关
 - 记忆点：看到“用户输入 + new File 拼路径 + 前缀校验” → 先想路径遍历；`!startsWith` 这种反转校验 = 漏洞放大器
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：
 
 ---
+
 ### Q4 — 存在 SQL 注入的原因（参数化形同虚设）
 
 **来源:** 每日一练 App
@@ -138,11 +135,10 @@ ResultSet results = pstmt.executeQuery();
 - 正确写法：`"SELECT * FROM db_user WHERE username = ? AND password = ?"` + `pstmt.setString(1, username)` + `setString(2, pwd)`
 - 记忆点：**预编译防注入的前提是占位符 + 绑定变量**；看到“拼接字符串传给 prepareStatement” = 披着预编译外衣的普通拼 SQL
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：
 
 ---
+
 ### Q5 — JPA 防范 SQL 注入的方式
 
 **来源:** 每日一练 App
@@ -168,11 +164,10 @@ ResultSet results = pstmt.executeQuery();
 - 对比记忆：MyBatis 用 `#{}`（预编译）防注入、`${}`（拼接）会注入；JPA 对应三件套 = 位置参数 `?1` / 命名参数 `:name` / 命名查询 `@NamedQuery`
 - 记忆点：看到 JPQL 里的 `?1` / `:name` / @NamedQuery → 都是参数化防注入的手段，全选才完整
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：
 
 ---
+
 ### Q6 — RESTful API 中 PUT 请求对应的操作
 
 **来源:** 每日一练 App
@@ -227,11 +222,10 @@ ResultSet results = pstmt.executeQuery();
 - 补充：Spring Security **6.x 起推荐统一用 `requestMatchers()`**，antMatchers/mvcMatchers 等旧方法已标记弃用（但仍是受支持的匹配方式，老项目大量在用）
 - 记忆点：ant=通配符路径、regex=正则、mvc=贴合 MVC 路由；三者都可 → 选“都支持”；新写法一律 requestMatchers()
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：Spring Security支持AntMatchers、RegexMatchers、MvcMatchers的请求拦截方式。
 
 ---
+
 ### Q8 — 创建根 ApplicationContext 的官方推荐类
 
 **来源:** 每日一练 App
@@ -256,11 +250,10 @@ ResultSet results = pstmt.executeQuery();
   - ContextWebListener / ContextWebServlet：**不存在**的干扰类名 ❌
 - 记忆点：加载根容器 → 认准 **ContextLoaderListener**（listener 声明式加载）；看到 LoaderServlet 要能识别它是老古董
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：ContextLoaderListener 实现了 ServletContextListener，是 当前唯一推荐 的方式。  ContextLoaderServlet 是早期版本的实现，从 Spring 3.0 开始已被移除，不应用于新项目。
 
 ---
+
 ### Q9 — Servlet 转向且地址栏不变的实现方式
 
 **来源:** 每日一练 App
@@ -316,11 +309,10 @@ ResultSet results = pstmt.executeQuery();
   - 选项3 说 BeanPostProcessor 作用于**实例化**阶段前后 ❌ —— 它作用的是**初始化**阶段前后
 - 记忆点：**名字即职责**：Instantiation(实例化)Aware → 管实例化；BeanPostProcessor → 管初始化；前者 `extends` 后者
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：InstantiationAwareBeanPostProcessor继承了BeanPostProcessor接口  InstantiationAwareBeanPostProcessor作用于实例化阶段的前后  BeanPostProcessor作用于初始化阶段的前后
 
 ---
+
 ### Q11 — 不是 HikariCP 成为 Spring Boot 2 默认连接池的原因
 
 **来源:** 每日一练 App
@@ -345,11 +337,10 @@ ResultSet results = pstmt.executeQuery();
 - **“监控全面”不是选它的原因**：HikariCP 的监控能力并不突出（仅有基础的 JMX/Micrometer 指标），而**内置监控面板/全面监控恰恰是 Druid 的招牌卖点**（阿里 Druid 自带可视化监控台、SQL 审计等）——把 Druid 的优点安到 HikariCP 头上就是这题的坑 ❌
 - 记忆点：Hikari 三字诀 = **快（性能）/ 小（代码量）/ 稳（稳定性）**；看到“监控全面/监控台” → 那是 Druid 的活
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：HikariCP注重于性能，监控上稍差
 
 ---
+
 ### Q12 — Spring Web 上下文中 Bean 的作用域
 
 **来源:** 每日一练 App
@@ -379,11 +370,10 @@ ResultSet results = pstmt.executeQuery();
 - 补充：Spring 4.2+ 还多了 **application**（ServletContext 级）作用域，但经典五作用域按题目选项来
 - 记忆点：作用域 = **单例/原型 + 请求/会话/globalSession**（后面三个只有 Web 环境才有）；代理/适配器/工厂 → 设计模式，别串台
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：Spring Web 上下文中 Bean 的核心作用域是：单例、原型、请求、会话、globalSession。
 
 ---
+
 ### Q13 — @Configuration + @Bean 代码的说法
 
 **来源:** 每日一练 App
@@ -420,11 +410,10 @@ public class AppConfig {
 - 补充：`@Configuration` 本身是 `@Component` 的派生注解，如果配置了 `@ComponentScan` 也会被自动发现；`@Bean` 方法还可以显式指定 `name` 属性改名、用 `@Scope` 改作用域
 - 记忆点：**@Configuration = 配置类、@Bean 方法 = 手动造 Bean**；方法名即 Bean 名；看到“不编译/必须叫 Config”这类说法直接排除
 
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：- `@Configuration` 表示这是一个 Spring 配置类。 - `@Bean` 注解的方法 `myService()` 会在 Spring 容器中注册一个名为 `myService` 的 Bean，类型为 `MyServiceImpl`（或其接口 `MyService` 类型）。
 
 ---
+
 ### Q14 — 不是 Spring Boot 默认支持的数据源类型
 
 **来源:** 每日一练 App
@@ -485,5 +474,4 @@ public class AppConfig {
 | 08-25 | 15 | 9 | 6 |
 | **合计** | **15** | **9** | **6** |
 
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：@RestController 是 @Controller + @ResponseBody 的组合注解，类内所有请求处理方法默认带 @ResponseBody，支持 JSON/XML 序列化。
