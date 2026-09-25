@@ -85,12 +85,10 @@
   - `informa` — 不存在此命令
   - `get` — 获取键值对
   - `set` — 设置键值对
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：看Redis使用情况及状态信息用info
 
 ---
+
 ### Q4 — Redis SCARD 集合运算
 
 **来源:** 每日一练 App
@@ -132,12 +130,10 @@ SCARD cd
 - **关键细节：**
   - 步骤⑥：`julia` 早已不在 ca 中（步骤②已移到 cb），所以只移除了 `go` 和 `ruby`，ca 剩下 {php, java, c}
   - 步骤⑦：并集 {php, java, c} ∪ {java, go, c} = {php, java, c, go}，共 4 个元素
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：``` SADD ca "php" "java" "go" "c" "ruby" "julia" #创建集合 ca:php java go c ruby julia SMOVE ca cb "julia" #把julia从ca移到cb中;cb:julia,ca:php java go c ruby SADD cb "ruby" ;添加元素;cb:julia ruby SDIFFSTORE cc ca cb #获取ca cb的差集 cc:php go c java SMOVE cc ca "php"  #把php从cc移到ca中 #cc:go c java #ca:php go c ruby SREM ca "go" "ruby" "julia" #删除元素;ca:php c SUNIONSTORE cd ca cc #获取ca cc的并集:cd:php go c java SCARD cd #输出cd的元素数量:4 ```
 
 ---
+
 ### Q5 — Tomcat Coyote 网络协议
 
 **来源:** 每日一练 App
@@ -218,12 +214,10 @@ SCARD cd
 - 解析后交给 **Container 容器顶层（Engine）** 处理
 - Engine → Host → Context → Wrapper 逐级向下分发
 - Connector 不直接跟 Context 打交道，Container 也不干解析的活
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：正确答案：Server  正确选项解析：  *Server 是正确答案。Server是Tomcat架构中的顶级组件，代表整个Tomcat实例。它负责管理一个或多个Service组件，并提供了Tomcat的启动、停止等生命周期管理功能。  错误选项解析：  *Engine是Service的子组件，负责处理请求并管理多个Host，但它不管理整个Tomcat实例。  *Host是Engine的子组件，代表一个虚拟主机，用于部署和管理Web应用程序，但它不管理整个Tomcat实例。  *Connector是Service的子组件，负责处理特定协议（如HTTP/HTTPS）的请求，但它不管理整个Tomcat实例。
 
 ---
+
 ### Q8 — Tomcat 顶层容器
 
 **来源:** 每日一练 App
@@ -245,12 +239,10 @@ SCARD cd
 - 每个 Service 包含若干 Connector + 一个 Engine
 - Engine → Host → Context → Wrapper 都在 Server 管理之下
 - Engine 是 Container 的顶层，但不是整个 Tomcat 实例的顶层
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：正确答案：Server  正确选项解析：  *Server 是正确答案。Server是Tomcat架构中的顶级组件，代表整个Tomcat实例。它负责管理一个或多个Service组件，并提供了Tomcat的启动、停止等生命周期管理功能。  错误选项解析：  *Engine是Service的子组件，负责处理请求并管理多个Host，但它不管理整个Tomcat实例。  *Host是Engine的子组件，代表一个虚拟主机，用于部署和管理Web应用程序，但它不管理整个Tomcat实例。  *Connector是Service的子组件，负责处理特定协议（如HTTP/HTTPS）的请求，但它不管理整个Tomcat实例。
 
 ---
+
 ### Q9 — Tomcat ProtocolHandler 组件
 
 **来源:** 每日一练 App
@@ -272,12 +264,10 @@ SCARD cd
 - **Processor**：解析 HTTP 请求报文
 - **Adapter**：将解析后的请求适配给 Container 处理
 - **Request** 是 Processor 解析后产生的对象，不是 ProtocolHandler 的组件
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：ProtocolHandler包含了三个非常重要的组件：Endpoint、Processor、Adapter
 
 ---
+
 ### Q10 — MyBatis Resources 加载配置
 
 **来源:** 每日一练 App
@@ -331,12 +321,10 @@ SCARD cd
   | `separator` | 元素之间的分隔符，如 `,` |
 - **`itif`** 不是任何合法属性名，纯干扰项
 - `collection` 是必填属性，`index` 和 `separator` 都是可选合法属性
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
   解析：itif 不是 MyBatis 的标签或属性
 
 ---
+
 ### Q12 — Redis 命令执行过程分析
 
 **来源:** 每日一练 App + 新版题库 Excel（2026-09-25 同步）
