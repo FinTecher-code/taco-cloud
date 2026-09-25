@@ -8,25 +8,25 @@
 
 ### Q1 — HyperLogLog 基数估算准确率影响因素
 
-**来源:** 每日一练 App
+**来源:** 每日一练 App + 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 影响 HyperLogLog 基数估算准确率的因素？
+**题目:** HyperLogLog在对集合的基数进行估计时，以下哪个因素可能会影响估计的精度？
 
 **选项:**
-1. 集合中元素的 Hash 函数
-2. 集合中元素的数据类型
+1. 集合中元素的数据类型
+2. 集合中元素的顺序
 3. HyperLogLog 的空间大小 ✅
-4. 集合中元素的数据量
+4. HyperLogLog 的读写操作频率
 
-**我的答案:** 集合中元素的数据类型 ❌
-**正确答案:** HyperLogLog 的空间大小
+**我的答案:** 选项1（集合中元素的数据类型） ❌
+
+**正确答案:** 选项3
 
 **解析:**
-- HyperLogLog 的误差率取决于寄存器数量，而寄存器数量由它占用的空间大小决定
-- 标准 Redis HyperLogLog 占用 12KB（2^14 个寄存器），误差率约 0.81%
-- 空间越大 → 寄存器越多 → 精度越高，这是唯一影响因素
-- 元素数据类型、Hash 函数、数据量均不影响固定误差率
-- HLL 的核心特性是"用空间换精度"，与数据本身无关
+- **官方解析（Excel）:** HyperLogLog 的空间大小会影响估计的精度。空间大小指的是用于存储 HyperLogLog 数据结构的内存大小。较小的空间可能导致估计不准确，而较大的空间可以提高估计的准确性。
+- 元素的数据类型、元素的顺序、读写操作频率并不会直接影响估计精度
+- **深度补充:** HyperLogLog 的误差率取决于寄存器数量，而寄存器数量由它占用的空间大小决定；标准 Redis HyperLogLog 固定占 12KB（2^14 个寄存器），误差率约 0.81%
+- 记忆点：HLL 是“用空间换精度”，误差只跟空间（寄存器数）有关，与数据内容无关
 
 ---
 
@@ -91,19 +91,21 @@
   解析：看Redis使用情况及状态信息用info
 
 ---
-### Q4 — Redis 命令执行过程分析
+### Q4 — Redis SCARD 集合运算
 
 **来源:** 每日一练 App
 
-**题目:** 下列 Redis 命令执行过程描述正确的是？
+**题目:** 执行以下 Redis 命令后，`SCARD cd` 输出是什么？
 
 ```text
-1  SADD        user      "child"    "student"    "worker"
-2  SADD        person    "worker"   "farmer"     "child"
-3  SREM        person                "child"
-4  SDIFFSTORE  diff      user        person
-5  SMOVE       diff      person      "farmer"
-6  SCARD       person
+SADD ca "php" "java" "go" "c" "ruby" "julia"
+SMOVE ca cb "julia"
+SADD cb "ruby"
+SDIFFSTORE cc ca cb
+SMOVE cc ca "php"
+SREM ca "go" "ruby" "julia"
+SUNIONSTORE cd ca cc
+SCARD cd
 ```
 
 **选项:**
@@ -112,33 +114,28 @@
 3. 6
 4. 2
 
-**我的答案:** 选项2（3） ❌
-**正确答案:** 选项1（4）
+**我的答案:** 选项3（6） ❌
+**正确答案:** `4`
 
 **解析:**
 - **逐步推导：**
-  | 步骤 | 命令 | 执行结果 | 当前状态 |
-  |------|------|---------|---------|
-  | 1 | `SADD user "child" "student" "worker"` | 返回 3（新加 3 个） | user = {child, student, worker} |
-  | 2 | `SADD person "worker" "farmer" "child"` | 返回 2（farmer 为新加） | person = {worker, farmer, child} |
-  | 3 | `SREM person "child"` | 返回 1（成功移除） | person = {worker, farmer} |
-  | 4 | `SDIFFSTORE diff user person` | 返回 2（存了 2 个元素） | diff = {child, student}（差集） |
-  | 5 | `SMOVE diff person "farmer"` | 返回 **0**（farmer 不在 diff 中） | diff/person 不变 ❗ |
-  | 6 | `SCARD person` | 返回 **2**（person 有 2 个元素） | person = {worker, farmer} |
-- **逐项验证选项：**
-  - ✅ `diff` 确实为 {child, student}，两个元素
-  - ❌ `SMOVE` 失败返回 0，不是 1
-  - ❌ `SCARD person` 输出 2，不是 3
-  - ❌ `SREM` 成功返回 1，不是 0
-- **关键考点：**
-  - `SDIFFSTORE` 计算差集并存储（user - person）
-  - `SMOVE` 元素必须在源集合中才能移动，否则返回 0
-  - `SREM` 移除存在的元素返回 1，不存在返回 0
-  - 一步步推算集合状态，不要凭感觉跳步
+  | 步骤 | 命令 | ca | cb | cc | cd |
+  |------|------|:--:|:--:|:--:|:--:|
+  | ① | `SADD ca 6个元素` | {php,java,go,c,ruby,julia} | ∅ | ∅ | ∅ |
+  | ② | `SMOVE ca→cb julia` | {php,java,go,c,ruby} | {julia} | ∅ | ∅ |
+  | ③ | `SADD cb ruby` | {php,java,go,c,ruby} | {julia,ruby} | ∅ | ∅ |
+  | ④ | `SDIFFSTORE cc ca⊖cb` | {php,java,go,c,ruby} | {julia,ruby} | **{php,java,go,c}** | ∅ |
+  | ⑤ | `SMOVE cc→ca php` | {php,java,go,c,ruby} | {julia,ruby} | {java,go,c} | ∅ |
+  | ⑥ | `SREM ca go ruby julia` | **{php,java,c}** | {julia,ruby} | {java,go,c} | ∅ |
+  | ⑦ | `SUNIONSTORE cd ca∪cc` | {php,java,c} | {julia,ruby} | {java,go,c} | **{php,java,c,go}** |
+  | ⑧ | `SCARD cd` | | | | **→ 4** |
+- **关键细节：**
+  - 步骤⑥：`julia` 早已不在 ca 中（步骤②已移到 cb），所以只移除了 `go` 和 `ruby`，ca 剩下 {php, java, c}
+  - 步骤⑦：并集 {php, java, c} ∪ {java, go, c} = {php, java, c, go}，共 4 个元素
 
 
 - 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：SADD user "child" "student" "worker" 创建 user: child student worker；SADD person 创建 person: worker farmer child；SREM person "child" 输出 1，person: worker farmer；SDIFFSTORE diff user person 差集 diff: child student；SMOVE diff person "farmer"（farmer 不在 diff 中，失败输出 0，person 不变）；SCARD person 输出 2。
+  解析：``` SADD ca "php" "java" "go" "c" "ruby" "julia" #创建集合 ca:php java go c ruby julia SMOVE ca cb "julia" #把julia从ca移到cb中;cb:julia,ca:php java go c ruby SADD cb "ruby" ;添加元素;cb:julia ruby SDIFFSTORE cc ca cb #获取ca cb的差集 cc:php go c java SMOVE cc ca "php"  #把php从cc移到ca中 #cc:go c java #ca:php go c ruby SREM ca "go" "ruby" "julia" #删除元素;ca:php c SUNIONSTORE cd ca cc #获取ca cc的并集:cd:php go c java SCARD cd #输出cd的元素数量:4 ```
 
 ---
 ### Q5 — Tomcat Coyote 网络协议
@@ -340,53 +337,51 @@
   解析：itif 不是 MyBatis 的标签或属性
 
 ---
-### Q12 — Redis SCARD 集合运算
+### Q12 — Redis 命令执行过程分析
 
-**来源:** 每日一练 App
+**来源:** 每日一练 App + 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 执行以下 Redis 命令后，`SCARD cd` 输出是什么？
+**题目:** 下面命令执行过程描述正确的是？
 
 ```text
-SADD ca "php" "java" "go" "c" "ruby" "julia"
-SMOVE ca cb "julia"
-SADD cb "ruby"
-SDIFFSTORE cc ca cb
-SMOVE cc ca "php"
-SREM ca "go" "ruby" "julia"
-SUNIONSTORE cd ca cc
-SCARD cd
+1  SADD        user     "child"    "student"    "worker"
+2  SADD        person   "worker"   "farmer"     "child"
+3  SREM        person              "child"
+4  SDIFFSTORE  diff     user       person
+5  SMOVE       diff     person     "farmer"
+6  SCARD       person
 ```
 
 **选项:**
-1. 4 ✅
-2. 3
-3. 6
-4. 2
+1. diff 含有两个元素:"student","child" ✅
+2. SMOVE 操作成功输出 1
+3. SCARD 输出 3
+4. SREM 操作失败输出 0
 
-**我的答案:** 选项3（6） ❌
-**正确答案:** `4`
+**我的答案:** 选项3 ❌
+
+**正确答案:** 选项1
 
 **解析:**
-- **逐步推导：**
-  | 步骤 | 命令 | ca | cb | cc | cd |
-  |------|------|:--:|:--:|:--:|:--:|
-  | ① | `SADD ca 6个元素` | {php,java,go,c,ruby,julia} | ∅ | ∅ | ∅ |
-  | ② | `SMOVE ca→cb julia` | {php,java,go,c,ruby} | {julia} | ∅ | ∅ |
-  | ③ | `SADD cb ruby` | {php,java,go,c,ruby} | {julia,ruby} | ∅ | ∅ |
-  | ④ | `SDIFFSTORE cc ca⊖cb` | {php,java,go,c,ruby} | {julia,ruby} | **{php,java,go,c}** | ∅ |
-  | ⑤ | `SMOVE cc→ca php` | {php,java,go,c,ruby} | {julia,ruby} | {java,go,c} | ∅ |
-  | ⑥ | `SREM ca go ruby julia` | **{php,java,c}** | {julia,ruby} | {java,go,c} | ∅ |
-  | ⑦ | `SUNIONSTORE cd ca∪cc` | {php,java,c} | {julia,ruby} | {java,go,c} | **{php,java,c,go}** |
-  | ⑧ | `SCARD cd` | | | | **→ 4** |
-- **关键细节：**
-  - 步骤⑥：`julia` 早已不在 ca 中（步骤②已移到 cb），所以只移除了 `go` 和 `ruby`，ca 剩下 {php, java, c}
-  - 步骤⑦：并集 {php, java, c} ∪ {java, go, c} = {php, java, c, go}，共 4 个元素
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：``` SADD ca "php" "java" "go" "c" "ruby" "julia" #创建集合 ca:php java go c ruby julia SMOVE ca cb "julia" #把julia从ca移到cb中;cb:julia,ca:php java go c ruby SADD cb "ruby" ;添加元素;cb:julia ruby SDIFFSTORE cc ca cb #获取ca cb的差集 cc:php go c java SMOVE cc ca "php"  #把php从cc移到ca中 #cc:go c java #ca:php go c ruby SREM ca "go" "ruby" "julia" #删除元素;ca:php c SUNIONSTORE cd ca cc #获取ca cc的并集:cd:php go c java SCARD cd #输出cd的元素数量:4 ```
+- **官方解析（Excel）:**
+  - `SADD user "child" "student" "worker"` → 创建集合 user: child student worker
+  - `SADD person "worker" "farmer" "child"` → 创建集合 person: worker farmer child
+  - `SREM person "child"` → 从 person 中移除 child，**输出 1**，person: worker farmer
+  - `SDIFFSTORE diff user person` → 取 user - person 的差集，diff: **child student**
+  - `SMOVE diff person "farmer"` → farmer 不在 diff 中，**操作失败输出 0**，person 不变
+  - `SCARD person` → 输出 person 中的元素数量: **2**
+- **逐项验证:**
+  - ✅ 选项1：diff = {child, student}，确实两个元素
+  - ❌ 选项2：SMOVE 失败，输出 0 不是 1
+  - ❌ 选项3：SCARD person = 2，不是 3（这是本题的坑：你可能以为 SMOVE 成功会把 farmer 移出/移入）
+  - ❌ 选项4：SREM 成功移除存在的元素，输出 1 不是 0
+- **关键考点:**
+  - `SDIFFSTORE destination key1 key2`：存的是 key1 - key2 的差集
+  - `SMOVE src dst member`：member 必须在 **src** 中才移动，否则返回 0
+  - `SREM` 移除存在的元素返回 1，不存在返回 0
 
 ---
+
 ### Q13 — MyBatis 动态 SQL 说法
 
 **来源:** 每日一练 App
