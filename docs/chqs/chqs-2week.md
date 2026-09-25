@@ -39,26 +39,17 @@
 **选项:**
 1. 按页面分别创建 HyperLogLog，分别统计各页面访问量
 2. 每天创建一个 HyperLogLog，使用 PFADD 记录访问者 IP，用 PFCOUNT 统计各天访问量
-3. 每日创建一个 HyperLogLog，用 PFADD 记录访问者 IP，用 PFMERGE 合并所有天数的数据，再用 PFCOUNT 统计总访问量 ✅
-4. 按每天创建一个 HyperLogLog，使用 PFADD 命令记录访问者的 IP 地址，使用 PFMERGE 命令合并所有天数的 HyperLogLog，使用 PFCOUNT 命令统计总的访问量 ❌
+3. 每日创建一个 HyperLogLog，用 PFADD 记录访问者 IP，用 PFMERGE 合并所有天数的数据，再用 PFCOUNT 统计总访问量
+4. 按每天创建一个 HyperLogLog，使用 PFADD 命令记录访问者的 IP 地址，使用 PFCOUNT 命令统计每天的访问量 ✅
 
-**我的答案:** 选项4 ❌
-**正确答案:** 选项3
+**我的答案:** 选项3 ❌
+**正确答案:** 选项4（按每天创建一个 HyperLogLog，使用 PFADD 命令记录访问者的 IP 地址，使用 PFCOUNT 命令统计每天的访问量）
 
 **解析:**
-- 这道题的陷阱在于题目问的是"统计电商网站每天访问量"，而选项2看起来合理（每天一个 HLL + PFADD + PFCOUNT），但它少了一步——题目真正想考的是 **HyperLogLog 的合并能力（PFMERGE）**
-- **完整流程：**
-  1. 每天一个 HyperLogLog key（如 `uv:2026-07-14`）
-  2. **PFADD** 记录每次访问的访客标识（IP/用户ID）
-  3. 需要统计某几天或全部的总 UV 时
-  4. 用 **PFMERGE** 合并多个天的 HLL 数据到临时 key
-  5. 再用 **PFCOUNT** 统计合并后的基数
-- **PFMERGE 的核心价值：**
-  - HLL 合并具有数学性质，合并后的结果 ≈ 对多天访客做整体去重
-  - 而简单对各天 PFCOUNT 再相加，不等于总独立访客（同一个人访问多天会被重复计算）
-- **关键考点：**
-  - PFADD 记录 → PFCOUNT 单日统计 → PFMERGE 多日合并 → PFCOUNT 总统计
-  - HLL 的合并运算特性（选项2缺了 PFMERGE 这一步）
+- 题目问的是“**每天**的访问量（当日 UV）”——直接**每天创建一个 HyperLogLog**，用 `PFADD` 加入访客 IP，当天用 `PFCOUNT` 就能得到该日 UV
+- 选项3 里用 PFMERGE 合并所有天数再统计，得到的是“**多日合计的总 UV**”，回答的不是“每天访问量”，属于答非所问
+- 陷阱：PFMERGE 是另一道场景题（统计累计总 UV 时去重合并）的正确工具，别在这题里干扰你
+- 关键考点：PFADD 记录 → PFCOUNT 单日统计；PFMERGE 只在“合并多日去重总数”场景下用
 
 ---
 
