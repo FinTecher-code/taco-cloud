@@ -74,7 +74,7 @@
 3. `get`
 4. `set`
 
-**我的答案:** `info` ✅
+**我的答案:** **我的答案:** 选项1（`info`） ✅
 **正确答案:** `info`
 
 **解析:**
@@ -95,8 +95,11 @@
   - `get` — 获取键值对
   - `set` — 设置键值对
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：看Redis使用情况及状态信息用info
+
+---
 ### Q4 — Redis 命令执行过程分析
 
 **来源:** 每日一练 App
@@ -113,13 +116,13 @@
 ```
 
 **选项:**
-1. `diff` 含有两个元素：`"student"`、`"child"` ✅
-2. `SMOVE` 操作成功输出 `1`
-3. `SCARD` 输出 `3` ❌
-4. `SREM` 操作失败输出 `0`
+1. 4 ✅
+2. 3
+3. 6
+4. 2
 
-**我的答案:** 选项3 - `SCARD` 输出 `3` ❌
-**正确答案:** 选项1
+**我的答案:** **我的答案:** 选项2（3） ❌
+**正确答案:** 选项1（4）
 
 **解析:**
 - **逐步推导：**
@@ -142,8 +145,11 @@
   - `SREM` 移除存在的元素返回 1，不存在返回 0
   - 一步步推算集合状态，不要凭感觉跳步
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：``` SADD ca "php" "java" "go" "c" "ruby" "julia" #创建集合 ca:php java go c ruby julia SMOVE ca cb "julia" #把julia从ca移到cb中;cb:julia,ca:php java go c ruby SADD cb "ruby" ;添加元素;cb:julia ruby SDIFFSTORE cc ca cb #获取ca cb的差集 cc:php go c java SMOVE cc ca "php"  #把php从cc移到ca中 #cc:go c java #ca:php go c ruby SREM ca "go" "ruby" "julia" #删除元素;ca:php c SUNIONSTORE cd ca cc #获取ca cc的并集:cd:php go c java SCARD cd #输出cd的元素数量:4 ```
+
+---
 ### Q5 — Tomcat Coyote 网络协议
 
 **来源:** 每日一练 App
@@ -211,13 +217,13 @@
 **题目:** Tomcat 中 Connector 和 Container 是怎样交互的？
 
 **选项:**
-1. Connector 直接将请求交给 Context 处理
-2. Connector 将请求交给 Engine，再由 Engine 交给 Host
-3. Connector 解析 HTTP 请求，然后交给 Engine ✅
-4. Container 取代 Connector 解析 HTTP 请求
+1. Engine
+2. Host
+3. Server ✅
+4. Connector
 
 **我的答案:** 选项3 ✅
-**正确答案:** Connector 解析 HTTP 请求，然后交给 Engine
+**正确答案:** 选项3（Server）
 
 **解析:**
 - **Connector** 负责接收并**解析 HTTP 请求**，将其封装为 `Request`/`Response` 对象
@@ -225,8 +231,11 @@
 - Engine → Host → Context → Wrapper 逐级向下分发
 - Connector 不直接跟 Context 打交道，Container 也不干解析的活
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：正确答案：Server  正确选项解析：  *Server 是正确答案。Server是Tomcat架构中的顶级组件，代表整个Tomcat实例。它负责管理一个或多个Service组件，并提供了Tomcat的启动、停止等生命周期管理功能。  错误选项解析：  *Engine是Service的子组件，负责处理请求并管理多个Host，但它不管理整个Tomcat实例。  *Host是Engine的子组件，代表一个虚拟主机，用于部署和管理Web应用程序，但它不管理整个Tomcat实例。  *Connector是Service的子组件，负责处理特定协议（如HTTP/HTTPS）的请求，但它不管理整个Tomcat实例。
+
+---
 ### Q8 — Tomcat 顶层容器
 
 **来源:** 每日一练 App
@@ -249,8 +258,11 @@
 - Engine → Host → Context → Wrapper 都在 Server 管理之下
 - Engine 是 Container 的顶层，但不是整个 Tomcat 实例的顶层
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：正确答案：Server  正确选项解析：  *Server 是正确答案。Server是Tomcat架构中的顶级组件，代表整个Tomcat实例。它负责管理一个或多个Service组件，并提供了Tomcat的启动、停止等生命周期管理功能。  错误选项解析：  *Engine是Service的子组件，负责处理请求并管理多个Host，但它不管理整个Tomcat实例。  *Host是Engine的子组件，代表一个虚拟主机，用于部署和管理Web应用程序，但它不管理整个Tomcat实例。  *Connector是Service的子组件，负责处理特定协议（如HTTP/HTTPS）的请求，但它不管理整个Tomcat实例。
+
+---
 ### Q9 — Tomcat ProtocolHandler 组件
 
 **来源:** 每日一练 App
@@ -258,10 +270,10 @@
 **题目:** 以下哪个**不是** ProtocolHandler 的三个重要组件之一？
 
 **选项:**
-1. Endpoint
-2. Processor
-3. Adapter
-4. Request ✅
+1. `Endpoint`
+2. `Processor`
+3. `Adapter`
+4. `Request` ✅
 
 **我的答案:** 未记录具体选项（原记录状态：❌ 答错）
 **正确答案:** Request
@@ -273,8 +285,11 @@
 - **Adapter**：将解析后的请求适配给 Container 处理
 - **Request** 是 Processor 解析后产生的对象，不是 ProtocolHandler 的组件
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：ProtocolHandler包含了三个非常重要的组件：Endpoint、Processor、Adapter
+
+---
 ### Q10 — MyBatis Resources 加载配置
 
 **来源:** 每日一练 App
@@ -308,12 +323,12 @@
 **题目:** MyBatis `<foreach>` 标签不包含哪个属性？
 
 **选项:**
-1. `collection`
-2. `itif` ✅
-3. `index`
-4. `separator`
+1. collection
+2. itif ✅
+3. index
+4. separator
 
-**我的答案:** `itif` ✅
+**我的答案:** **我的答案:** 选项2（itif） ✅
 **正确答案:** 选项2 - `itif`
 
 **解析:**
@@ -329,8 +344,11 @@
 - **`itif`** 不是任何合法属性名，纯干扰项
 - `collection` 是必填属性，`index` 和 `separator` 都是可选合法属性
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：itif 不是 MyBatis 的标签或属性
+
+---
 ### Q12 — Redis SCARD 集合运算
 
 **来源:** 每日一练 App
@@ -349,12 +367,12 @@ SCARD cd
 ```
 
 **选项:**
-1. `4` ✅
-2. `3`
-3. `6` ❌
-4. `2`
+1. 4 ✅
+2. 3
+3. 6
+4. 2
 
-**我的答案:** `6` ❌
+**我的答案:** **我的答案:** 选项3（6） ❌
 **正确答案:** `4`
 
 **解析:**
@@ -373,8 +391,11 @@ SCARD cd
   - 步骤⑥：`julia` 早已不在 ca 中（步骤②已移到 cb），所以只移除了 `go` 和 `ruby`，ca 剩下 {php, java, c}
   - 步骤⑦：并集 {php, java, c} ∪ {java, go, c} = {php, java, c, go}，共 4 个元素
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：``` SADD ca "php" "java" "go" "c" "ruby" "julia" #创建集合 ca:php java go c ruby julia SMOVE ca cb "julia" #把julia从ca移到cb中;cb:julia,ca:php java go c ruby SADD cb "ruby" ;添加元素;cb:julia ruby SDIFFSTORE cc ca cb #获取ca cb的差集 cc:php go c java SMOVE cc ca "php"  #把php从cc移到ca中 #cc:go c java #ca:php go c ruby SREM ca "go" "ruby" "julia" #删除元素;ca:php c SUNIONSTORE cd ca cc #获取ca cc的并集:cd:php go c java SCARD cd #输出cd的元素数量:4 ```
+
+---
 ### Q13 — MyBatis 动态 SQL 说法
 
 **来源:** 每日一练 App

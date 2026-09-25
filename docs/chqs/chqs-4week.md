@@ -18,7 +18,7 @@
 3. admin
 4. root ✅
 
-**我的答案:** root ✅
+**我的答案:** **我的答案:** 选项4（root） ✅
 **正确答案:** root
 
 **解析:**
@@ -27,8 +27,11 @@
 - DBA 是数据库管理员职位,不是用户
 - admin 是常见用户名,但不是 MySQL 预设超级用户
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：root是mysql默认的拥有最高权限的用户
+
+---
 ### Q2 — MySQL BETWEEN 区间查询
 
 **来源:** 每日一练 App
@@ -41,7 +44,7 @@
 3. `i IN INTERVAL(0, 11)`
 4. `i BETWEEN 0 AND 11`
 
-**我的答案:** `i BETWEEN 1 AND 10` ✅
+**我的答案:** **我的答案:** 选项1（`i BETWEEN 1 AND 10`） ✅
 **正确答案:** `i BETWEEN 1 AND 10`
 
 **解析:**
@@ -49,8 +52,11 @@
 - `IN INTERVAL` 不是 MySQL 合法语法
 - `BETWEEN 0 AND 11` 范围过大,不符合要求
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：待补充
+
+---
 ### Q3 — MySQL 水平分区模式
 
 **来源:** 每日一练 App
@@ -58,12 +64,12 @@
 **题目:** 水平分区模式中,大多数用到的模式为?
 
 **选项:**
-1. Range 分区 ✅
-2. Hash 分区
-3. Key 分区
-4. List 分区
+1. Range分区 ✅
+2. Hash分区
+3. Key分区
+4. List分区
 
-**我的答案:** Range 分区 ✅
+**我的答案:** **我的答案:** 选项1（Range分区） ✅
 **正确答案:** Range 分区
 
 **解析:**
@@ -75,8 +81,11 @@
 
 ## 2026-07-28
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：- Range（范围） – 这种模式允许DBA将数据划分不同范围，一般经常用到此模式的分区。例如DBA可以将一个表通过年份划分成三个分区，80年代（1980's）的数据，90年代（1990's）的数据以及任何在2000年（包括2000年）后的数据。  - Hash（哈希）  – 这种模式允许DBA通过对表的一个或多个列的Hash Key进行计算，最后通过这个Hash码不同数值对应的数据区域进行分区。例如DBA可以建立一个对表主键进行分区的表。  - Key（键值）    – Hash模式的一种延伸，这里的Hash Key是MySQL系统产生的。  - List（预定义列表） – 这种模式允许系统通过DBA定义的列表的值所对应的行数据进行分割。例如：DBA建立了一个横跨三个分区的表，分别根据2004年2005年和2006年值所对应的数据。  - Composite（复合模式） - 很神秘吧，哈哈，其实是以上模式的组合使用而已，就不解释了。举例：在初始化已经进行了Range范围分区的表上，我们可以对其中一个分区再进行hash哈希分区。
+
+---
 ### Q4 — 给已有表添加主键约束
 
 **来源:** 每日一练 App
@@ -106,13 +115,29 @@
 **题目:** MyISAM 表 user(字段 id, name, email),name 和 email 均已建全文索引,最有效查询关键词的写法是?
 
 **选项:**
-1. `select id,name from user where name like '%关键词%' or email like '%关键词%';`
-2. `select id,name from user where match(name,email) against('关键词' in Boolean mode);` ✅
-3. `select id,name from user where match(name) against('关键词' in Boolean mode) or match(email) against('关键词' in Boolean mode);`
-4. `select id,name from user where match(name) against('关键词' in Boolean mode) union select id,name from user where match(email) against('关键词' in Boolean mode);`
+1. 
+  ```  
+  SELECT id, name FROM user WHERE name LIKE '%关键词%' OR email LIKE '%关键词%';  
+    
+  ```
+2. 
+  ```  
+  SELECT id, name FROM user WHERE MATCH(name, email) AGAINST('关键词' IN BOOLEAN MODE);  
+    
+  ``` ✅
+3. 
+  ```  
+  SELECT id, name FROM user WHERE MATCH(name) AGAINST('关键词' IN BOOLEAN MODE) OR MATCH(email) AGAINST('关键词' IN BOOLEAN MODE);  
+    
+  ```
+4. 
+  ```  
+  SELECT id, name FROM user WHERE MATCH(name) AGAINST('关键词' IN BOOLEAN MODE) UNION SELECT id, name FROM user WHERE MATCH(email) AGAINST('关键词' IN BOOLEAN MODE);  
+    
+  ```
 
 **我的答案:** 选项2 ✅
-**正确答案:** 选项2
+**正确答案:** 选项2（```）
 
 **解析:**
 - `LIKE '%关键词%'` 无法走索引,大表性能差
@@ -124,8 +149,11 @@
 
 ## 2026-07-31
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：``` SELECT id, name FROM user WHERE MATCH(name, email) AGAINST('关键词' IN BOOLEAN MODE);  ``` 这个选项正确，这个选项使用了一个MATCH函数，并且使用了布尔模式，所以可以利用索引，而且只需要一次查询，性能最优。  ``` SELECT id, name FROM user WHERE name LIKE '%关键词%' OR email LIKE '%关键词%';  ``` 这个选项错误，这个选项使用了LIKE操作符，但是由于使用了%作为前缀和后缀，所以无法利用索引，会导致全表扫描，性能很差。  ``` SELECT id, name FROM user WHERE MATCH(name) AGAINST('关键词' IN BOOLEAN MODE) OR MATCH(email) AGAINST('关键词' IN BOOLEAN MODE);  ``` 这个选项错误，这个选项使用了两个MATCH函数，但是由于使用了OR连接，所以也无法利用索引，会导致全表扫描，性能很差。  ``` SELECT ……
+
+---
 ### Q6 — TDSQL 跨地域迁移数据一致性验证
 
 **来源:** 每日一练 App
@@ -251,13 +279,13 @@
 **题目:** 下列关于 TDSQL 的实例,描述不正确的是?
 
 **选项:**
-1. 实例指的是数据库服务的集合,是提供数据库服务的基本单位
+1. 实例指的是数据库服务的集合，是提供数据库服务的基本单位
 2. 实例可以通过赤兔界面进行创建、隔离、恢复、删除等操作
 3. 实例可分为分布式实例和非分布式实例
-4. 创建实例是必须创建一主两从的规格 ❌
+4. 创建实例是必须创建一主两从的规格 ✅
 
 **我的答案:** 选项4 ✅
-**正确答案:** 选项4 ✅
+**正确答案:** 选项4（创建实例是必须创建一主两从的规格）
 
 **解析:**
 - **选项1 ✅**:实例确实是数据库服务的集合和基本单位,描述正确
@@ -272,8 +300,11 @@
 
 ## 2026-08-01
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：正确答案：创建实例是必须创建一主两从的规格。答案解析：这个选项是错误的，在创建实例是，可以根据资源灵活的选取一主一从，一主两从，一主三从的规格。
+
+---
 ### Q11 — 分析 JVM Native Memory 泄漏的工具
 
 **来源:** 每日一练 App
@@ -287,7 +318,7 @@
 4. `jstat -gcutil`
 
 **我的答案:** 选项2 ✅
-**正确答案:** 选项2
+**正确答案:** 选项2（`jcmd <pid> VM.native_memory`）
 
 **解析:**
 - **Native Memory** 是 JVM 直接向操作系统申请的内存(堆外),包括 Metaspace、Code Cache、Direct Buffer、线程栈等,泄漏时进程 RSS 持续上涨但堆内存正常
@@ -302,8 +333,11 @@
 > - 堆内对象/GC → `jmap -histo` / `jstat`
 > - 线程/死锁 → `jstack`
 
----
 
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：正确答案是：`jcmd <pid> VM.native_memory`。jcmd的VM.native_memory支持Native Memory追踪。 其它分别为分析堆对象；获取线程栈和监控GC。
+
+---
 ### Q12 — JVM 优化参数描述(选错 ❌)
 
 **来源:** 每日一练 App
@@ -311,13 +345,13 @@
 **题目:** 在对 JVM 参数进行优化时,下列几个优化参数描述错误的是?
 
 **选项:**
-1. `-Xms1200M` 表示设置 JVM 初始堆内存为 1200M
-2. `-Xmx1200m` 表示设置 JVM 初始堆内存为 1200M ✅(错误描述)
-3. `-Xmn1g` 表示设置堆内存年轻代大小为 1G
+1. “=-Xms1200M” 表示设置 JVM 初始堆内存为 1200M
+2. “-Xmx1200m” 表示设置 JVM 初始堆内存为 1200M ✅
+3. “-Xmn1g” 表示设置堆内存年轻代大小为 1G
 4. 整个堆内存大小 = 年轻代大小 + 年老代大小 + 持久代大小
 
 **我的答案:** 选项1 ❌
-**正确答案:** 选项2
+**正确答案:** 选项2（“-Xmx1200m” 表示设置 JVM 初始堆内存为 1200M）
 
 **解析:**
 - 题目问的是**描述错误**的选项,选项2 才是错的:`-Xmx` 设置的是**最大堆内存**(maximum heap),不是**初始堆内存**
@@ -331,6 +365,9 @@
 > - **`-Xmn` = 年轻代大小**
 > - 常见陷阱:把 `-Xmx` 说成"初始堆内存"是错误描述
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：“-Xmx1200m“ 表示设置 JVM 最大堆内存为 1200M
 ### Q13 — 服务器内存充足但 JVM 内存耗尽的原因
 
 **来源:** 每日一练 App
@@ -344,7 +381,7 @@
 4. CPU 占用过高
 
 **我的答案:** 选项2 ✅
-**正确答案:** 选项2
+**正确答案:** 选项2（JVM 参数配置不当）
 
 **解析:**
 - 服务器可用内存充足,说明**操作系统层面内存没问题**,排除选项1(系统内存不足)
@@ -356,6 +393,9 @@
 > 物理内存充足但 JVM OOM → 查 **JVM 参数配置**(`-Xmx` 等),不是系统问题
 > 区分:系统内存不足(OS 层面) vs JVM 内存不足(JVM 堆配置层面)
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：JVM的内存配置可能不够大，导致在可用内存充足的情况下仍无法为JVM分配足够的堆内存。
 ### Q14 — G1 垃圾回收器描述(选错 ❌)
 
 **来源:** 每日一练 App
@@ -392,12 +432,12 @@
 
 **选项:**
 1. top 命令查看 CPU 和内存占比情况
-2. jps -l 列出所有运行的 Java 程序
-3. ls 查看具体的 JVM 线程信息 ✅(错误描述)
+2. jps -l 列出所有的运行的 Java 程序
+3. ls 查看具体的 JVM 线程信息 ✅
 4. 通过 jstack 查看 Java 中具体线程栈信息
 
 **我的答案:** 选项3 ✅
-**正确答案:** 选项3
+**正确答案:** 选项3（ls 查看具体的 JVM 线程信息）
 
 **解析:**
 - **`ls`**(选项3 ✅):只是**列出目录内容**的命令,跟 JVM 线程信息毫无关系,是本题的错误步骤
@@ -421,3 +461,6 @@
 | 07-31 | 5 | 2 | 3 |
 | 08-01 | 5 | 3 | 2 |
 | **合计** | **15** | **10** | **5** |
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：线上 JVM 堆内存溢出（OOM）分析步骤： 1. 通过 top 命令查看 cpu 和内存占比情况，找到占用最多的 PID：top ； 2. 通过 jps -l 列出所有的运行的 Java 程序，可以看到步骤 1 中的 PID 对应的 Java 程序：jps -l ； 3. 通过 ps 查看具体的 JVM 线程：ps -mp [ 线程号 ] -o THREAD , tid , time ； 4. 通过 jstack 查看 Java 中具体线程栈信息：jstack [ 进程ID ] | grep [ 线程的16进制id ] -A 行数 ； 6. 通过 jstat 查看内存回收情况： jstat -gcutil 线程 ID 间隔毫秒数 次数。
