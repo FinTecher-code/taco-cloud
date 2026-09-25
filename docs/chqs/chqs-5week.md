@@ -28,7 +28,7 @@
 - `/etc/ssh.config` 路径不存在，全局配置统一在 `/etc/ssh/` 下
 - 口诀：客户端 `ssh_config`，服务端 `sshd_config`；全局放 `/etc/ssh/`，个人放 `~/.ssh/`
 
-  解析：OpenSSH 客户端 的全局配置文件是 /etc/ssh/ssh_config。  OpenSSH 服务器 的配置文件是 /etc/ssh/sshd_config。
+- **官方补充（Excel）:** OpenSSH 客户端 的全局配置文件是 /etc/ssh/ssh_config。 OpenSSH 服务器 的配置文件是 /etc/ssh/sshd_config。
 
 ---
 
@@ -53,7 +53,7 @@
 - 选项2 用 `=` 语法错误；选项3 把服务器和域名混在一起；选项4 缺少 `@`，dig 会用系统默认 DNS（`/etc/resolv.conf`）
 - 记忆点：`@` = 指定 DNS 服务器，`dig @服务器 域名`
 
-  解析：dig 是 Linux/Unix 中查询 DNS 记录的工具，指定 DNS 服务器的语法固定：`dig @<DNS服务器地址> <目标域名>`
+- **官方补充（Excel）:** dig 是 Linux/Unix 中查询 DNS 记录的工具，指定 DNS 服务器的语法固定：`dig @<DNS服务器地址> <目标域名>`
 
 ---
 
@@ -78,7 +78,7 @@
 - 选项3 不准确：是指定解释器，不是启动解释器
 - 记忆点：`#!` = 用后面这个程序来跑我；`#!/bin/bash` = 用 bash 执行本脚本
 
-  解析：Shebang 行（例如 #!/bin/bash）位于脚本的第一行，其目的是告诉系统应该使用哪个解释器来执行这个脚本文件。
+- **官方补充（Excel）:** Shebang 行（例如 #!/bin/bash）位于脚本的第一行，其目的是告诉系统应该使用哪个解释器来执行这个脚本文件。
 
 ---
 
@@ -103,7 +103,7 @@
 - 选项1 `purge` 是清理缓存用；选项3 `exit` 是退出 shell；选项4 `rest` 不是标准命令
 - 记忆点：kill 按编号，killall 按名字
 
-  解析：killall 命令可以根据进程名称向所有匹配的进程发送信号（默认 SIGTERM），从而停止进程。
+- **官方补充（Excel）:** killall 命令可以根据进程名称向所有匹配的进程发送信号（默认 SIGTERM），从而停止进程。
 
 ---
 
@@ -130,11 +130,9 @@
 
 ---
 
----
-
 ## 2026-08-12
 
-  解析：/etc/resolv.conf 文件是用于配置域名系统（DNS）解析相关设置的文件。它主要包含了 DNS 服务器的信息，告诉系统在进行域名解析时应该向哪些 DNS 服务器发送请求。
+- **官方补充（Excel）:** /etc/resolv.conf 文件是用于配置域名系统（DNS）解析相关设置的文件。它主要包含了 DNS 服务器的信息，告诉系统在进行域名解析时应该向哪些 DNS 服务器发送请求。
 
 ---
 
@@ -160,7 +158,7 @@
 - 选项3 是正确的 COW 核心思想，用户选了这个说明对 COW 的理解有偏差——"资源的复制只有在需要写入的时候才进行"和"以只读方式共享"都是对的
 - 记忆点：fork 快 = COW 延迟拷贝 = 父子共享只读页 → 写入时才复制；**整个地址空间复制是错的，只复制页表+COW**
 
-  解析：创建子进程时并不复制整个地址空间，而是让父进程和子进程共享一个拷贝
+- **官方补充（Excel）:** 创建子进程时并不复制整个地址空间，而是让父进程和子进程共享一个拷贝
 
 ---
 
@@ -191,7 +189,7 @@
 - 选项1 和 2 的表述本身就不对：fork 和 clone 在栈空间上没有"谁复制谁不复制"的区别
 - 记忆点：fork = 简化版 clone（flags 固定）；clone = 万能任务创建器 = 进程 + 线程 + 容器
 
-  解析：`clone`是一个更灵活的系统调用。它可以用于创建进程或线程，并且可以通过参数指定创建新的命名空间（`namespace`），可以有选择地继承父进程的内存，还可以通过设置参数使创建出来的进程成为父进程的兄弟进程等多种复杂的进程创建场景。
+- **官方补充（Excel）:** `clone`是一个更灵活的系统调用。它可以用于创建进程或线程，并且可以通过参数指定创建新的命名空间（`namespace`），可以有选择地继承父进程的内存，还可以通过设置参数使创建出来的进程成为父进程的兄弟进程等多种复杂的进程创建场景。
 
 ---
 
@@ -218,7 +216,7 @@
 - 选项4：`find -name test.txt /` 参数顺序错误，路径应紧跟 `find` 命令
 - 记忆点：找文件用 `find` 不是 `grep`；语法：`find 路径 -name 文件名`，路径放最前面
 
-  解析：查找服务器上是否存在test.txt文件的命令是:find / -name test.txt
+- **官方补充（Excel）:** 查找服务器上是否存在test.txt文件的命令是:find / -name test.txt
 
 ---
 
@@ -245,7 +243,7 @@
 - 用户选了选项3 是误以为"孤儿进程的资源不是 init 回收的"——实际上 init 收养后就接管了资源回收
 - 记忆口诀：父先死 → 子成孤儿 → init 领养回收；子先死 → 父不管 → 子成僵尸 → 残留 PCB
 
-  解析：子进程退出了，但是父进程没有用wait或waitpid去获取子进程的状态信息，那么子进程的进程描述符仍然保存在系统中，这种进程称为僵尸进程。
+- **官方补充（Excel）:** 子进程退出了，但是父进程没有用wait或waitpid去获取子进程的状态信息，那么子进程的进程描述符仍然保存在系统中，这种进程称为僵尸进程。
 
 ---
 
@@ -273,7 +271,7 @@
 - 选项4 对：线程的核心优势就是并发 + 共享地址空间
 - 记忆点：Linux 线程 = 不分家，一个崩全家崩；Windows 线程理论上有更强的崩溃隔离（但实际也看情况）
 
-  解析：由于线程要依附于进程存在，一旦一个线程崩溃，会导致其所属进程的所有线程崩溃。
+- **官方补充（Excel）:** 由于线程要依附于进程存在，一旦一个线程崩溃，会导致其所属进程的所有线程崩溃。
 
 ---
 
@@ -302,7 +300,7 @@
 - 用户选 onstat 是典型的"看到了 on 开头就以为是客户端"——实际上 on* 系列是服务器管理工具，dbaccess 才是掏出来写 SQL 的家伙
 - 记忆点：onstat=状态查看，onmode=模式切换，oninit=启动，**dbaccess=连库跑SQL**
 
-  解析：GBase 8s用于连接数据库，并可执行sql的客户端命令行工具是dbaccess
+- **官方补充（Excel）:** GBase 8s用于连接数据库，并可执行sql的客户端命令行工具是dbaccess
 
 ---
 
@@ -329,7 +327,7 @@
 - 选项4 ✅：支持错误数据溯源，可以定位到源文件中具体出错的行——这个内置工具确实支持，用户选了这项说明低估了加载工具的诊断能力
 - 记忆点：GBase 8a 加载 = 高度集成 + 多格式 + 多机并行 + 错误溯源；"不支持多加载机并行"是假限制
 
-  解析：GBase 8a MPP Cluster 数据加载具备如下一些特性和优点：   1）与集群高度集成；   2）面向用户的 SQL 接口方式更符合用户的使用习惯；   3）支持单表多数据源并行加载，支持多加载机对单表的并行加载，最大化提升加载性能；   4）支持从通用数据服务器拉取数据，支持 ftp/http/hdfs/Kafka/sftp/https/AMAZON S3 等多种文件传输协议；   5）支持普通文本（csv、txt 等）、json、gzip 压缩、snappy 压缩、lzo 压缩等多种格式数据文件；   6）支持普通文本、定长文本、宽松模式的加载；   7）支持错误数据溯源功能，可以准确定位错误数据在源文件中的位置；   8）加载性能可以随着集群规模的扩展而持续提升。
+- **官方补充（Excel）:** GBase 8a MPP Cluster 数据加载具备如下一些特性和优点： 1）与集群高度集成； 2）面向用户的 SQL 接口方式更符合用户的使用习惯； 3）支持单表多数据源并行加载，支持多加载机对单表的并行加载，最大化提升加载性能； 4）支持从通用数据服务器拉取数据，支持 ftp/http/hdfs/Kafka/sftp/https/AMAZON S3 等多种文件传输协议； 5）支持普通文本（csv、txt 等）、json、gzip 压缩、snappy 压缩、lzo 压缩等多种格式数据文件； 6）支持普通文本、定长文本、宽松模式的加载； 7）支持错误数据溯源功能，可以准确定位错误数据在源文件中的位置； 8）加载性能可以随着集群规模的扩展而持续提升。
 
 ---
 
@@ -357,7 +355,7 @@
 - 用户选 row 是把逻辑概念和物理 IO 混了——row 是你看数据的方式，page 是磁盘读写的方式
 - 记忆点：数据库 IO 四层塔：Chunk > Extent > Page（最小IO）> Row（不可IO）
 
-  解析：GBase 8s数据库最小的IO单元是page
+- **官方补充（Excel）:** GBase 8s数据库最小的IO单元是page
 
 ---
 
@@ -389,7 +387,7 @@ CREATE TABLE t1(a int, b varchar(10), KEY a_key(a) USING HASH GLOBAL);
 - `USING HASH GLOBAL` 即"全局哈希索引"方式，数据在各节点间随机均匀分布
 - 记忆点：看见 `USING HASH GLOBAL` → 随机分布表（不是 hash！）
 
-  解析：默认创建的是随机分布表
+- **官方补充（Excel）:** 默认创建的是随机分布表
 
 ---
 
@@ -424,38 +422,25 @@ CREATE TABLE t1(a int, b varchar(10), KEY a_key(a) USING HASH GLOBAL);
 | 23456 | 小区2 | 2.10 | 3.20 |
 
 **选项:**
-1. 
-  ```  
-  SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A JOIN TAB_PARAMETER B ON A.CI=B.CI;  
-  ```
-2. 
-  ```  
-  SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A LEFT JOIN TAB_PARAMETER B ON A.CI=B.CI;  
-  ``` ✅
-3. 
-  ```  
-  SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A, TAB_PARAMETER B WHERE A.CI=B.CI;  
-  ```
-4. 
-  ```  
-  SELECT * FROM TAB_CI JOIN TAB_PARAMETER USING(CI);  
-  ```
+1. `SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A JOIN TAB_PARAMETER B ON A.CI=B.CI;`
+2. `SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A LEFT JOIN TAB_PARAMETER B ON A.CI=B.CI;` ✅（本题问不正确的）
+3. `SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A, TAB_PARAMETER B WHERE A.CI=B.CI;`
+4. `SELECT * FROM TAB_CI JOIN TAB_PARAMETER USING(CI);`
 
 **我的答案:** 选项3 ❌
-**正确答案:** 选项2（```）
+**正确答案:** 选项2（LEFT JOIN 写法不满足期望输出）
 
 **解析:**
 - 期望结果只有 2 行（CI 匹配 12345 和 23456），即**内连接**结果
 - 逐一分析：
-  - 选项1：`JOIN ... ON` → 标准内连接，结果 2 行 ✅
-  - 选项2：`LEFT JOIN` → 左外连接，保留 TAB_CI 全部 4 行，未匹配的（45678 小区4、56789 小区5）P1/P2 为 NULL → 结果 **4 行**，与期望不符 ❌ **这是不正确的那条**
-  - 选项3：逗号分隔 + WHERE → 实际上是隐式内连接，等价于选项1，结果 2 行 ✅。用户选了这项是误以为逗号写法不等于 JOIN——其实标准 SQL 中 `FROM A, B WHERE A.id = B.id` 和 `FROM A JOIN B ON A.id = B.id` 等价
-  - 选项4：`JOIN ... USING(CI)` → 也是内连接，`USING` 是 ON 的简写形式（当两表列名相同时），结果 2 行 ✅
+  - 选项1：`JOIN ... ON` → 标准内连接，结果 2 行（写法正确）
+  - 选项2：`LEFT JOIN` → 左外连接，保留 TAB_CI 全部 4 行，未匹配的（45678 小区4、56789 小区5）P1/P2 为 NULL → 结果 **4 行**，与期望不符 → **这就是本题要选的"不正确"写法**
+  - 选项3：逗号分隔 + WHERE → 隐式内连接，等价于选项1，结果 2 行（写法正确）。你当时选了这项——误以为逗号写法不等于 JOIN，其实 `FROM A, B WHERE A.id=B.id` 与 `JOIN ... ON` 等价
+  - 选项4：`JOIN ... USING(CI)` → 也是内连接，`USING` 是 ON 的简写形式（两表列名相同时），结果 2 行（写法正确）
 - 记忆点：逗号连接 + WHERE = 内连接（不是错误的）；LEFT JOIN 会多出未匹配行，与内连接结果不同
 
 ---
-
----
+- **官方补充（Excel）:** 选项`SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A LEFT JOIN TAB_PARAMETER B ON A.CI=B.CI;`写法错误。正确写法是`SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A JOIN TAB_PARAMETER B ON A.CI=B.CI;`，其他三项都对
 
 ## 📊 第五周错题汇总
 
@@ -465,4 +450,3 @@ CREATE TABLE t1(a int, b varchar(10), KEY a_key(a) USING HASH GLOBAL);
 | 08-12 | 10 | 2 | 8 |
 | **合计** | **15** | **5** | **10** |
 
-  解析：选项`SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A LEFT JOIN TAB_PARAMETER B ON A.CI=B.CI;`写法错误。正确写法是`SELECT A.CI,A.CINAME,B.P1,B.P2 FROM TAB_CI A JOIN TAB_PARAMETER B ON A.CI=B.CI;`，其他三项都对
