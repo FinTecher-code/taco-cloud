@@ -495,48 +495,40 @@ SCARD cd
 
 ### Q15 — MyBatis choose 多条件筛选
 
-**来源:** 每日一练 App
+**来源:** 每日一练 App + 新版题库 Excel（2026-09-25 同步）
 
-**题目:** `<choose>` 实现多条件筛选的问题
-
-**场景:** 根据用户名、邮箱、手机号三者至少一个参数筛选用户。
-
-**原代码：**
+**题目:** 在用户信息查询接口中，需要实现根据用户名、邮箱、手机号三者至少一个参数筛选数据。现有动态SQL如下：
 ```xml
 <select id="selectUsers">
-    SELECT * FROM users WHERE
-    <choose>
-        <when test="username != null">username = #{username}</when>
-        <when test="email != null">email = #{email}</when>
-        <when test="phone != null">phone = #{phone}</when>
-        <otherwise>1=1</otherwise>
-    </choose>
+  SELECT * FROM users WHERE
+  <choose>
+    <when test="username != null">username = #{username}</when>
+    <when test="email != null">email = #{email}</when>
+    <when test="phone != null">phone = #{phone}</when>
+    <otherwise>1=1</otherwise>
+  </choose>
 </select>
 ```
+当同时传入username和email参数时，查询结果仅根据username筛选，导致数据不全。应如何修改？
 
-**问题：** 同时传入 `username` 和 `email` 时，仅根据 `username` 筛选，email 条件被忽略。
+**选项:**
+1. 调整when条件顺序，将email判断放在username之前
+2. 将choose标签替换为if标签，并用OR连接条件 ✅
+3. 在otherwise标签中添加所有参数的非空判断
+4. 为每个when条件添加AND前缀，保持choose结构不变
 
-**原因：** `<choose>` 相当于 Java 的 `switch-case`，只执行第一个匹配的 `<when>`，不继续匹配后续条件。
+**我的答案:** 选项2 ✅
 
-**正确修改：** 改用 `<if>`，每个条件独立判断：
-```xml
-<select id="selectUsers">
-    SELECT * FROM users
-    <where>
-        <if test="username != null">and username = #{username}</if>
-        <if test="email != null">and email = #{email}</if>
-        <if test="phone != null">and phone = #{phone}</if>
-    </where>
-</select>
-```
-
-**我的答案:** 未记录具体选项（原记录状态：✅ 答对）
-**正确答案:** 改用 `<if>` 实现多条件组合查询
+**正确答案:** 选项2
 
 **解析:**
-- `<choose>/<when>` 用于 **多选一** 场景（如按不同字段排序）
-- `<if>` 用于 **多选多** 场景（多条件组合查询）
-- 题目要求"至少一个参数"，传几个筛几个，必须用 `<if>`
+- **官方解析（Excel）:**
+  - 选1 ❌：choose 只执行第一个匹配的 when，调整顺序只改优先级，无法多条件组合
+  - 选2 ✅：if 标签支持多条件叠加，可同时匹配 username 和 email 实现组合查询
+  - 选3 ❌：otherwise 仅在所有 when 不满足时触发，与参数共存场景无关
+  - 选4 ❌：choose 结构只能产生单个条件，加 AND 会导致首条件前出现多余连接词
+- **深度补充:** `<choose>/<when>` 相当于 switch-case，多选一；`<if>` 相当于独立 if，多选多——"至少一个参数、传几个筛几个"必须用 `<if>`
+- 记忆点：**组合查询用 if，互斥查询用 choose**
 
 ---
 
