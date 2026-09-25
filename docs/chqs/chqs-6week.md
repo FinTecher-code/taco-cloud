@@ -136,7 +136,15 @@
 
 **来源:** 每日一练 App
 
-**题目:** 显示版本信息可以使用的命令是？
+**题目:** 显示版本信息可以使用的命令是
+
+a、`mvn -version`
+
+b、`mvn -v`
+
+c、`mvn -V`
+
+d、`mvn -show-version`
 
 **选项:**
 1. acd
@@ -154,14 +162,7 @@
 - 所以 a、b、c、d 四个全都属于"显示版本信息"的命令，全选 abcd ✅
 - 用户选了 abc，漏掉了 d（mvn -show-version），以为它不算——其实 `-show-version` 和 `-V` 等价，都是显示版本后继续构建
 - 记忆点：version/v = 只显示版本就停；V/show-version = 显示版本继续跑；四个都显示版本
-
----
-
----
-
-## 2026-08-14
-
-  解析：mvn -version/-v 仅显示版本信息<br> mvn -show-version/-V 显示版本，不会跳过build过程
+- **官方补充（Excel）:** mvn -version/-v 仅显示版本信息； mvn -show-version/-V 显示版本，不会跳过build过程
 
 ---
 
@@ -251,8 +252,6 @@
   - `-Dmaven.test.skip=true`：跳过测试的**编译**和**运行**
   - `-DskipTests`：只跳过测试**运行**，但仍会编译测试代码
 - 记忆点：skip 后面跟 `true` 才是跳过；`skipTests` 只跳运行不跳编译
-
----
 
 ---
 
@@ -467,8 +466,6 @@ Maven 通过文件激活 profile 的标准结构：
 - **选项4**：`<groupId>` ❌ + `<activations>` 复数外壳 ❌（里面虽是 activation，但外层不合法）→ 错
 
 **记忆点:** profile 用 `<id>` 命名、`<activation>` 单数激活；文件触发看 `<file><exists>/<missing>`；出现 groupId 或 activations 就直接排除
-
----
 
 ---
 
