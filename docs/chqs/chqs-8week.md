@@ -8,9 +8,10 @@
 
 ### Q1 — Bean 生命周期中资源释放所在的阶段
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Boot
 
-**题目:** 假设某个bean要使用某种类型的资源，那么一般情况下应该把资源的释放放到bean的生命周期中____阶段。
+**题目:** 假设某个 bean 要使用某种类型的资源，那么一般情况下应该把资源的释放放到 bean 的生命周期中_____阶段。
 
 **选项:**
 1. 定义
@@ -19,13 +20,9 @@
 4. 销毁 ✅
 
 **我的答案:** 选项2 ❌
-
-**正确答案:** 选项4
+**正确答案:** 选项4（销毁）
 
 **解析:**
-- 在 Spring Bean 的生命周期中，资源的释放（如关闭文件、数据库连接、网络连接等清理操作）通常应放在 销毁阶段，以确保资源被正确回收，避免资源泄漏。
-
-**原深度解析（App 版，供参考）:**
 - 答案是**销毁（Destroy）阶段**：Bean 生命周期中资源的获取（连接、文件句柄、线程池等）一般在**初始化阶段**完成，对应的**释放必须放在销毁阶段**，保证容器关闭/Bean 销毁时资源被回收，避免泄漏 ✅
 - Spring 提供了三种声明销毁逻辑的方式：
   - `@Bean(destroyMethod = "close")` / XML `<bean destroy-method="...">`
@@ -35,12 +32,17 @@
 - 生命周期口诀记忆：**实例化 → 属性填充 → 初始化（拿资源）→ 使用 → 销毁（放资源）**；拿在初始化，放必在销毁
 - 记忆点：`@PostConstruct`（初始化后拿资源）配 `@PreDestroy`（销毁前放资源）；init = 拿，destroy = 放
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：在 Spring Bean 的生命周期中，资源的释放（如关闭文件、数据库连接、网络连接等清理操作）通常应放在 销毁阶段，以确保资源被正确回收，避免资源泄漏。
+
 ---
 ### Q2 — @SpringBootApplication 复合注解包含的三件套
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Boot
 
-**题目:** `@SpringBootApplication `引入了3个重要的注解，除了下面哪个注解？
+**题目:** `@SpringBootApplication` 引入了3个重要的注解，除了下面哪个注解？
 
 **选项:**
 1. `@SpringBootConfiguration`
@@ -49,13 +51,9 @@
 4. `@Controller` ✅
 
 **我的答案:** 选项4 ✅
-
-**正确答案:** 选项4
+**正确答案:** 选项4（`@Controller`）
 
 **解析:**
-- `@SpringBootApplication`是一个复合注解，包括@ComponentScan，和`@SpringBootConfiguration`，`@EnableAutoConfiguration`。其他不是主要的注解。
-
-**原深度解析（App 版，供参考）:**
 - `@SpringBootApplication` 是**复合注解**，由三件套组合而成：
   - **@SpringBootConfiguration**：启动类本身是配置类（@Configuration 的派生）
   - **@EnableAutoConfiguration**：开启自动配置（根据 classpath 依赖自动装配 Bean）
@@ -63,20 +61,26 @@
 - **@Controller 不在其中** —— 它是被扫**描**的对象（MVC 控制器），而不是 @SpringBootApplication 的组成部分 ✅
 - 记忆点：三件套口诀 = **配置（@SpringBootConfiguration）+ 自动装配（@EnableAutoConfiguration）+ 扫描（@ComponentScan）**；@Controller 是“被扫的”，不是“组成的”
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：`@SpringBootApplication`是一个复合注解，包括@ComponentScan，和`@SpringBootConfiguration`，`@EnableAutoConfiguration`。其他不是主要的注解。
+
 ---
 ### Q3 — ThreadPoolExecutor 构造参数说明（找不正确的）
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Boot
 
-**题目:** Spring Boot一般使用下面的函数创建线程池，选项中对参数说明不正确的是？
-```
+**题目:** Spring Boot 一般使用下面的函数创建线程池，选项中对参数说明不正确的是？
+
+```java
 public ThreadPoolExecutor(
-    int corePoolSize,  
-    int maximumPoolSize,  
-    long keepAliveTime,  
-    TimeUnit unit,  
-    BlockingQueue workQueue,  
-    ThreadFactory threadFactory,  
+    int corePoolSize,
+    int maximumPoolSize,
+    long keepAliveTime,
+    TimeUnit unit,
+    BlockingQueue workQueue,
+    ThreadFactory threadFactory,
     RejectedExecutionHandler handle
 )
 ```
@@ -87,21 +91,10 @@ public ThreadPoolExecutor(
 3. workQueue，就是等待队列，任务可以储存在任务队列中等待被执行，执行的是FIFO原则（先进先出）
 4. Hanlder储存被拒绝的队列列表，执行的也是FIFO原则，即超过一定keepalive时间之后的队列被删除 ✅
 
-**我的答案:** 选项3 ❌
-
-**正确答案:** 选项4
+**我的答案:** 选项3 ❌（选了 workQueue 的描述）
+**正确答案:** 选项4（Hanlder储存被拒绝的队列列表，执行的也是FIFO原则，即超过一定keepa）
 
 **解析:**
-- handler,是一种拒绝策略，我们可以在任务满了之后，拒绝执行某些任务。
-- handler的拒绝策略有四种：
-- ```
-- 第一种AbortPolicy:不执行新任务，直接抛出异常，提示线程池已满
-- 第二种DisCardPolicy:不执行新任务，也不抛出异常
-- 第三种DisCardOldSetPolicy:将消息队列中的第一个任务替换为当前新进来的任务执行
-- 第四种CallerRunsPolicy:直接调用execute来执行当前任务
-- ```
-
-**原深度解析（App 版，供参考）:**
 - 选项4 错误最根本：**Handler（RejectedExecutionHandler）不是“储存被拒绝任务的队列列表”**，而是**拒绝策略**（处理器），当核心线程满 + 队列满 + 最大线程数满时，对新任务执行的**处理策略**，与 FIFO、keepAliveTime 全都无关 ✅
 - Spring/JDK 内置四种拒绝策略：
   - **AbortPolicy**（默认）：直接抛 `RejectedExecutionException`
@@ -116,12 +109,17 @@ public ThreadPoolExecutor(
 - 用户选 C 的误区：把“等待队列 FIFO”当成了错点，但**真正错得离谱的是 D**——Handler 压根不是队列，是拒绝策略；看到“被拒绝队列/储存列表 + keepalive”这类拼接描述，基本可以锁定是错的
 - 记忆点：**Handler = 拒绝策略（4 种）**；keepAliveTime 只管非核心线程空闲存活；拒绝链 = 核心满 → 队列满 → 最大线程满 → 拒绝策略出手
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：handler,是一种拒绝策略，我们可以在任务满了之后，拒绝执行某些任务。 handler的拒绝策略有四种： ``` 第一种AbortPolicy:不执行新任务，直接抛出异常，提示线程池已满 第二种DisCardPolicy:不执行新任务，也不抛出异常 第三种DisCardOldSetPolicy:将消息队列中的第一个任务替换为当前新进来的任务执行 第四种CallerRunsPolicy:直接调用execute来执行当前任务 ```
+
 ---
 ### Q4 — @Transactional 使用说法（找错误的）
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Boot
 
-**题目:** 在Spring Boot中，关于`@Transactional`的使用，下面说法错误的是？
+**题目:** 在Spring Boot中，关于 `@Transactional` 的使用，下面说法错误的是？
 
 **选项:**
 1. 在接口上声明`@Transactional`时，注解可能无效
@@ -130,13 +128,9 @@ public ThreadPoolExecutor(
 4. 使用了`@Transactional`的方法，可以是`public`或`protected` ✅
 
 **我的答案:** 选项3 ❌
-
-**正确答案:** 选项4
+**正确答案:** 选项4（使用了`@Transactional`的方法，可以是`public`或`prot）
 
 **解析:**
-- 使用了@Transactional的方法，只能是public，@Transactional注解的方法都是被外部其他类调用才有效，故只能是public。道理和上面的有关联。故在 protected、private 或者 package-visible 的方法上使用 @Transactional 注解，它也不会报错，但事务无效
-
-**原深度解析（App 版，供参考）:**
 - 选项4 错误：**@Transactional 只能作用于 public 方法**。Spring 事务基于 AOP 代理实现，默认只拦截 public 方法，放在 `protected`/`private`/包级方法上**不会生效**（不会报错，但静默失效）✅
 - 其他三个选项**说的都是对的**：
   - 选项1 正确：**接口上声明 @Transactional 可能无效**——Spring 官方建议把注解放在**实现类/方法**上；接口注解依赖 JDK 动态代理才可能读到，若用 CGLIB 代理则读不到，所以“可能无效”成立
@@ -146,18 +140,22 @@ public ThreadPoolExecutor(
 - 事务失效全家桶记忆：**非 public 方法**（protected/private）、**同类自调用**（不走代理）、**异常被 catch 吞掉**（事务感知不到 RuntimeException）、**接口/代理方式不匹配**
 - 记忆点：看到“可以是 public 或 protected”→ 必错，@Transactional 只认 public；自调用失效是坑但说法本身是对的
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：使用了@Transactional的方法，只能是public，@Transactional注解的方法都是被外部其他类调用才有效，故只能是public。道理和上面的有关联。故在 protected、private 或者 package-visible 的方法上使用 @Transactional 注解，它也不会报错，但事务无效
+
 ---
 ### Q5 — @PostMapping + @ResponseStatus(CREATED) 的 void 方法行为
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Boot
 
-**题目:** 给定下面的代码，会发生的场景是？
-```
+**题目:** 给定下面的代码，会发生什么场景？
+
+```java
 @PostMapping
 @ResponseStatus(HttpStatus.CREATED)
-public void add (@RequestBody Person person) {
-    // ...
-}
+public void add(@RequestBody Person person)
 ```
 
 **选项:**
@@ -167,16 +165,9 @@ public void add (@RequestBody Person person) {
 4. 代码将无法编译，因为不能有`@ResponseStatus` 和一个空返回类型
 
 **我的答案:** 选项2 ❌
-
-**正确答案:** 选项1
+**正确答案:** 选项1（add方法接收POST请求，并将 `Person`对象映射到请求，并以 `CRE）
 
 **解析:**
-- 1. `@PostMapping` 表示处理 HTTP POST 请求。
-- 2. `@ResponseStatus(HttpStatus.CREATED)` 设置成功响应时的 HTTP 状态码为 201（CREATED）。
-- 3. `@RequestBody Person person` 将请求体 JSON/XML 反序列化为 Person 对象。
-- 4. 方法返回类型 `void` 表示没有响应体，但状态码已经指定为 201。
-
-**原深度解析（App 版，供参考）:**
 - 选项1 正确：`@PostMapping` 把 add 方法映射到 **POST 请求**；`@RequestBody Person person` 让 Spring MVC 用 Jackson 把**请求体 JSON 反序列化为 Person 对象**；`@ResponseStatus(HttpStatus.CREATED)` 把响应状态码设为 **201 Created**——即使方法返回 `void`（无响应体）也完全合法 ✅
 - 用户选选项2「背压」的误区：**背压（Backpressure）是响应式编程（Reactive Streams）的概念**（如 WebFlux/Project Reactor），跟传统 Spring MVC 的 @PostMapping 毫不相干——选项2 是拿响应式术语硬凑的干扰项 ❌
 - 排除其他选项：
@@ -184,10 +175,15 @@ public void add (@RequestBody Person person) {
   - 选项4：`void` 返回 + @ResponseStatus 完全合法，代码**能编译**——@ResponseStatus 的意义恰恰是“我不用返回 ResponseEntity，也能通过注解指定状态码” ❌
 - 记忆点：**void 方法 + @ResponseStatus = 只定状态码，不返回体**；看到“背压”出现在 Spring MVC 题里 → 响应式术语串台了，直接排除
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：1. `@PostMapping` 表示处理 HTTP POST 请求。 2. `@ResponseStatus(HttpStatus.CREATED)` 设置成功响应时的 HTTP 状态码为 201（CREATED）。 3. `@RequestBody Person person` 将请求体 JSON/XML 反序列化为 Person 对象。 4. 方法返回类型 `void` 表示没有响应体，但状态码已经指定为 201。
+
 ---
 ### Q6 — Zuul 过滤器 pre 类型的使用场景
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
 **题目:** Zuul 过滤器类型中，pre类型的使用场景是？
 
@@ -198,21 +194,9 @@ public void add (@RequestBody Person person) {
 4. 处理请求时发生错误时被调用
 
 **我的答案:** 选项3 ❌
-
-**正确答案:** 选项1
+**正确答案:** 选项1（在请求被路由之前调用）
 
 **解析:**
-- Zuul 中的过滤器总共有 4 种类型，且每种类型都有对应的使用场景。
-- 1）pre：
-- 可以在请求被路由之前调用。适用于身份认证的场景，认证通过后再继续执行下面的流程。
-- 2）route：
-- 在路由请求时被调用。适用于灰度发布场景，在将要路由的时候可以做一些自定义的逻辑。
-- 3）post：
-- 在 route 和 error 过滤器之后被调用。这种过滤器将请求路由到达具体的服务之后执行。适用于需要添加响应头，记录响应日志等应用场景。
-- 4）error：
-- 处理请求时发生错误时被调用。在执行过程中发送错误时会进入 error 过滤器，可以用来统一记录错误信息。
-
-**原深度解析（App 版，供参考）:**
 - 答案是 **pre（前置）过滤器：在请求被路由（route）之前调用** ✅——Zuul 四类过滤器按执行顺序：
   1. **pre**：路由**之前**（鉴权、限流、参数校验、请求头加工都在这做）
   2. **route**：路由请求时（转发到后端服务，如 Ribbon 负载均衡选实例）
@@ -222,15 +206,22 @@ public void add (@RequestBody Person person) {
 - 对照表记忆：**pre=前（进门前办事）、route=中（出门办事）、post=后（办完再收拾）、error=出事故（兜底）**；看到 pre 就锁定“路由之前/请求到达后端之前”
 - 记忆点：pre → 请求被路由**之前**调用（认证/限流/改请求）；四大类型顺序 pre → route → post → error
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：Zuul 中的过滤器总共有 4 种类型，且每种类型都有对应的使用场景。    1）pre： 可以在请求被路由之前调用。适用于身份认证的场景，认证通过后再继续执行下面的流程。    2）route： 在路由请求时被调用。适用于灰度发布场景，在将要路由的时候可以做一些自定义的逻辑。    3）post： 在 route 和 error 过滤器之后被调用。这种过滤器将请求路由到达具体的服务之后执行。适用于需要添加响应头，记录响应日志等应用场景。    4）error： 处理请求时发生错误时被调用。在执行过程中发送错误时会进入 error 过滤器，可以用来统一记录错误信息。
+
 ---
 ### Q7 — Zuul 能做什么（多选组合）
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
 **题目:** 下列关于“zuul 能做什么”描述正确的有：
-1. 验证与安全保障，识别面向各类资源的验证要求并拒绝那些与要求不符的请求。
-2. 动态路由，以动态方式根据需要将请求路由至不同后端集群处。
-3. 静态响应处理: 在边缘位置直接建立部分响应，从而避免其流入内部集群。
+
+**小项:**
+1. 验证与安全保障，识别面向各类资源的验证要求并拒绝那些与要求不符的请求
+2. 动态路由，以动态方式根据需要将请求路由至不同后端集群处
+3. 静态响应处理：在边缘位置直接建立部分响应，从而避免其流入内部集群
 
 **选项:**
 1. 1、2、3 ✅
@@ -238,14 +229,10 @@ public void add (@RequestBody Person person) {
 3. 1、3
 4. 2、3
 
-**我的答案:** 选项1 ✅
-
-**正确答案:** 选项1
+**我的答案:** 选项1（1、2、3）✅
+**正确答案:** 选项1 ✅
 
 **解析:**
-- 正确答案是“1、2、3
-
-**原深度解析（App 版，供参考）:**
 - **三项全对**——Zuul 作为 Spring Cloud 的 API 网关，三大核心能力就是：
   - **① 验证与安全**：网关层做统一的鉴权/认证，拦截不符要求的请求（pre 过滤器典型场景）✅
   - **② 动态路由**：按规则把请求路由到不同后端集群（route 过滤器，配合 Ribbon 负载均衡）✅
@@ -255,29 +242,29 @@ public void add (@RequestBody Person person) {
 - 记忆点：Zuul 三能力 = **验证安全 + 动态路由 + 边缘静态响应**；小项都成立时放心全选
 
 ---
+
 ### Q8 — Consul 注册中心优势（组合选择）
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
 **题目:** Consul注册中心有什么优势：
+
+**小项:**
 1. Consul提供健康检查
 2. Consul提供多种包括http、dns协议
 3. Consul支持多数据中心
 
 **选项:**
 1. 1、2、3 ✅
-2. 1、2
+2. 1、2 ❌
 3. 1、3
 4. 2、3
 
-**我的答案:** 选项2 ❌
-
-**正确答案:** 选项1
+**我的答案:** 选项2（1、2）❌
+**正确答案:** 选项1（1、2、3）✅
 
 **解析:**
-- 正确答案是：1、2、3
-
-**原深度解析（App 版，供参考）:**
 - **三项全对**：Consul 作为服务注册中心，三大优势全部成立：
   - **① 健康检查**：Consul 原生提供健康检查（HTTP/TCP/脚本探活），自动剔除不健康实例——这是它对比 Eureka 的核心优势之一 ✅
   - **② 多种协议（HTTP + DNS）**：Consul 同时支持 HTTP API 和 **DNS 查询**做服务发现（`name.service.consul` 直接解析），比 Eureka 只支持 HTTP 更灵活 ✅
@@ -287,9 +274,11 @@ public void add (@RequestBody Person person) {
 - 记忆点：Consul 三优势 = **健康检查 + HTTP/DNS + 多数据中心**；遇到“哪些是 Consul 优势”的题，三项全选基本不会错
 
 ---
+
 ### Q9 — Spring Cloud Consul 优势描述（找错误的）
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
 **题目:** Spring Cloud Consul组件的优势，下面描述错误的选项是哪一个？
 
@@ -300,13 +289,9 @@ public void add (@RequestBody Person person) {
 4. Consul官方提供web管理界面，etcd无此功能
 
 **我的答案:** 选项2 ❌
-
-**正确答案:** 选项3
+**正确答案:** 选项3（Consul使用Paxos算法来保证一致性）
 
 **解析:**
-- Consul使用 Raft 算法来保证一致性, 比复杂的 Paxos 算法更直接. 相比较而言, zookeeper 采用的是 Paxos, 而 etcd 使用的则是 Raft。
-
-**原深度解析（App 版，供参考）:**
 - 选项3 错误：**Consul 用的不是 Paxos，而是 Raft 算法**来保证一致性。Paxos 是 Zookeeper（Chubby）系的经典选择，Consul 用的是更易工程实现的 **Raft（共识算法）**——把 Paxos 安到 Consul 头上就是这题的坑 ✅
 - 用户选选项2 的误区：认为“etcd 也支持健康检查”所以选项2 描述有误——但**对比维度错了**：
   - etcd 提供的是**租约（Lease）+ TTL 心跳机制**，本质上也是健康检查机制，但**它没有内置服务级的健康检查**（如 HTTP 探活、依赖检查），Consul 的 Health Checks 是**一等公民特性**，所以“Consul 支持健康检查，etcd 不提供此功能”在 Spring Cloud 语境下**是成立的、描述正确** ❌
@@ -315,10 +300,15 @@ public void add (@RequestBody Person person) {
   - 选项4 正确：Consul **官方提供 Web UI**（`/ui` 管理界面），etcd 没有官方可视化面板
 - 记忆点：**Consul = Raft**（一致性），**Zookeeper = Paxos（ZAB 基于 Paxos 思想）**，**etcd = Raft**；看到“Consul 用 Paxos”→ 直接锁定错误项
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：Consul使用 Raft 算法来保证一致性, 比复杂的 Paxos 算法更直接. 相比较而言, zookeeper 采用的是 Paxos, 而 etcd 使用的则是 Raft。
+
 ---
 ### Q10 — Spring Cloud Nacos 原理说明（找错误的）
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
 **题目:** 关于下面Spring Cloud Nacos组件的原理说明，错误的选项是哪一个？
 
@@ -327,15 +317,12 @@ public void add (@RequestBody Person person) {
 2. Nacos 只提供了主动 push 机制，由服务端主动告知客户端服务列表 ✅
 3. Nacos 服务端提供了 InstanceController 类，其中包含了服务注册相关的 API 接口
 4. 客户端发起注册时，调用的接口是：`[post]: /nacos/v1/ns/instance`，其中 `serviceName` 表示服务名称，`namespace` 表示 Nacos 的命名空间
+5. Nacos 通过 namespace 来隔离服务，每个 namespace 下有多个 group，每个 group 下有多个 service，再通过 serviceName 确定服务实例
 
 **我的答案:** 选项2 ✅
-
-**正确答案:** 选项2
+**正确答案:** 选项2（Nacos 只提供了主动 push 机制，由服务端主动告知客户端服务列表）
 
 **解析:**
-- 在服务的调用方，为了保证本地服务实例列表的动态感知，Nacos与其他注册中心不同的是，采用了 Pull/Push同时运作的方式
-
-**原深度解析（App 版，供参考）:**
 - 选项2 错误：**Nacos 不是“只提供主动 push 机制”**，而是 **push + pull 双机制并存**：
   - **pull（默认主力）**：客户端**定时轮询**服务端拉取服务列表（默认约 10s 一次）
   - **push（辅助，UDP）**：服务端有变更时通过 **UDP push** 主动通知客户端，客户端收到后再去拉最新列表兜底——**push 只为减少延迟，不是唯一机制**，且 UDP 不可靠，所以核心还是 pull
@@ -347,15 +334,20 @@ public void add (@RequestBody Person person) {
 - 对比记忆：**Eureka = 纯 pull（客户端每 30s 拉）+ 心跳；Nacos = pull 为主 + UDP push 为辅；Consul = 服务端主动推送变更（watch）**
 - 记忆点：看到“Nacos 只提供 push / 全靠服务端推送”→ 必错，Nacos 是**轮询为主、push 为辅**
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：在服务的调用方，为了保证本地服务实例列表的动态感知，Nacos与其他注册中心不同的是，采用了 Pull/Push同时运作的方式
+
 ---
 ### Q11 — RetryConfiguration 代码的目的
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
-**题目:** 下面的代码的目的是什么？
+**题目:** 下面这段代码的目的是什么
 
-```
-package com.louis.mango.consumer;
+```java
+package practicedir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -366,21 +358,19 @@ import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 public class RetryConfiguration {
     private static Logger log = LoggerFactory.getLogger(RetryConfiguration.class);
 
-    @ConditionalOnMissingBean(name = "configServerRetryInterceptor")
     @Bean
-    public RetryOperationsInterceptor configServerRetryInterceptor(){
-
+    @ConditionalOnMissingBean(name = "configServerRetryInterceptor")
+    public RetryOperationsInterceptor configServerRetryInterceptor() {
         log.info(String.format(
-                "configServerRetryInterceptor: Changing backOffOptions " +
-                        "to initial: %s, multiplier: %s, maxInterval: %s",
-                1000, 1.2, 5000));
+            "configServerRetryInterceptor: Changing backOffOptions " +
+            "to initial: %s, multiplier: %s, maxInterval: %s",
+            1000, 1.2, 5000));
         return RetryInterceptorBuilder.stateless()
-                .backOffOptions(1000,1.2,5000)
-                .maxAttempts(10)
-                .build();
+            .backOffOptions(1000,1.2,5000)
+            .maxAttempts(10)
+            .build();
     }
 }
-
 ```
 
 **选项:**
@@ -390,14 +380,9 @@ public class RetryConfiguration {
 4. Consul作为注册中心时，实现控制重试，解决配置中心config server响应超时问题 ✅
 
 **我的答案:** 选项2 ❌
-
-**正确答案:** 选项4
+**正确答案:** 选项4（Consul作为注册中心时，实现控制重试，解决配置中心config server）
 
 **解析:**
-- 客户端需要在 config server 无响应时进行重试，以给 config server 时间进行恢复。
-- 利用 spring 提供的重试组件，可以方便的配置重试机制，包括重试间隔，重试次数等。
-
-**原深度解析（App 版，供参考）:**
 - 选项4 正确：这段代码是 **Spring Retry 的重试拦截器配置**，用于 **Spring Cloud Config（配置中心）客户端**在启动时加载配置的场景——当 **config server 响应超时**时，客户端按照配置的**退避策略（backOff）重试**获取配置，这是 Spring Cloud Config 官方推荐的 `configServerRetryInterceptor` 模式（配合 `spring.cloud.config.fail-fast=true` + Consul 作为注册中心的环境）✅
 - 代码关键点拆解：
   - `@ConditionalOnMissingBean(name = "configServerRetryInterceptor")`：**若容器已有同名 Bean 则不重复注册**——允许用户自定义覆盖默认重试配置，且避免重复定义
@@ -410,10 +395,15 @@ public class RetryConfiguration {
   - 选项3：**不是对启动异常的捕获**——try/catch 才是捕获，这里是**重试机制**（失败不立即报错，而是按策略再试），语义不同 ❌
 - 记忆点：`RetryInterceptorBuilder` + `backOffOptions` + `maxAttempts` = **Spring Retry 重试拦截器**；看到 `configServerRetryInterceptor` 这个名字就锁定“Config 配置中心失败重试”
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：客户端需要在 config server 无响应时进行重试，以给 config server 时间进行恢复。 利用 spring 提供的重试组件，可以方便的配置重试机制，包括重试间隔，重试次数等。
+
 ---
 ### Q12 — Sentinel 限流规则中表示调用关系限流策略的字段
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
 **题目:** Spring Cloud中，Sentinel组件的限流规则中表示调用关系限流策略的是？
 
@@ -424,13 +414,9 @@ public class RetryConfiguration {
 4. controlBehavior
 
 **我的答案:** 选项4 ❌
-
-**正确答案:** 选项3
+**正确答案:** 选项3（strategy）
 
 **解析:**
-- strategy: 调用关系限流策略，直连，链路等
-
-**原深度解析（App 版，供参考）:**
 - 答案是 **strategy（策略字段）**：Sentinel 的 `FlowRule` 中 `strategy` 字段用于设置**调用关系限流策略**（`FlowRuleStrategy`），取值如：
   - `STRATEGY_DIRECT`（0）：**直接限流**——针对当前资源本身
   - `STRATEGY_RELATE`（1）：**关联限流**——当关联资源达到阈值时限制当前资源（如支付接口限流连带限制下单接口）
@@ -443,10 +429,15 @@ public class RetryConfiguration {
   - **controlBehavior**：**流控效果**（直接拒绝/预热/排队等待）
 - 记忆口诀：**资源（resource）→ 阈值（count）→ 策略（strategy）→ 效果（controlBehavior）**；问“调用关系”= strategy（直接/关联/链路），问“超出后怎样”= controlBehavior（拒绝/预热/排队）
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：strategy: 调用关系限流策略，直连，链路等
+
 ---
 ### Q13 — Spring Cloud Gateway 的作用
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
 **题目:** Spring Cloud Gateway的作用是
 
@@ -457,12 +448,9 @@ public class RetryConfiguration {
 4. 通过轻量消息代理连接各个分布的节点，可用来广播状态的变化或者其他的消息指令
 
 **我的答案:** 选项2 ❌
-
-**正确答案:** 选项3
+**正确答案:** 选项3（旨在为微服务架构提供一种简单有效的统一的 API 路由管理方式）
 
 **解析:**
-
-**原深度解析（App 版，供参考）:**
 - 选项3 正确：**Spring Cloud Gateway = API 网关**，核心职责是**统一的 API 路由管理**——基于 Spring WebFlux（响应式）实现，通过 Route（路由）+ Predicate（断言）+ Filter（过滤器）把请求按规则转发到下游微服务，同时可做**统一鉴权、限流、日志、跨域**等横切处理 ✅
 - 用户选选项2 的误区：把 Gateway 当成**配置中心**了——**“外部配置统一管理”是 Spring Cloud Config（配置中心）的职责**，配套组件是 Config Server/Client，跟 Gateway 无关 ❌
 - 逐个排除：
@@ -476,10 +464,15 @@ public class RetryConfiguration {
   - **Bus** = 轻量消息代理，广播配置变更/状态变化
 - 记忆点：看到“路由管理”→ Gateway；看到“外部配置管理”→ Config；看到“消息代理广播”→ Bus；看到“注册发现”→ 注册中心
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：
+
 ---
 ### Q14 — application.properties 与 application.yml 并存时的优先级
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Boot
 
 **题目:** 如果SpringBoot中在项目的相同位置存在application.properties和application.yml，以下描述正确的是？
 
@@ -490,15 +483,9 @@ public class RetryConfiguration {
 4. 相同的key以.properties为准，某个key不在.properties且在.yml则以.yml为准 ✅
 
 **我的答案:** 选项4 ✅
-
-**正确答案:** 选项4
+**正确答案:** 选项4（相同的key以.properties为准，某个key不在.properties且）
 
 **解析:**
-- 根据Spring Boot的官方文档和常规行为，当两个文件都存在时，Spring Boot会优先加载application.properties文件。
-- - 如果两个文件定义了相同的键，application.properties中的值将覆盖application.yml中的值（假设application.properties先被加载）。
-- - 如果一个键只存在于其中一个文件中，则该文件中的值将被使用。
-
-**原深度解析（App 版，供参考）:**
 - 选项4 正确：Spring Boot 加载配置时，**同位置的 application.properties 优先级高于 application.yml**：
   - **相同 key**：以 **.properties 的值**为准，覆盖 .yml 中的同名配置
   - **key 只在 .yml 中**：使用 .yml 中的值（两者不是二选一，而是**合并加载**，properties 覆盖 yml）
@@ -507,12 +494,17 @@ public class RetryConfiguration {
 - 完整优先级梯子记忆（从高到低）：命令行参数 > Java 系统属性 / 环境变量 > application-{profile}.properties(yml) > **application.properties > application.yml** > 随机数/默认值……（同名规则同理：properties 压 yml 一头）
 - 记忆点：**同目录下 properties ＞ yml（同名 key 前者赢）；两份文件都生效（互补不互斥）**；选“以 properties 为准、yml 仅补缺”的选项
 
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：根据Spring Boot的官方文档和常规行为，当两个文件都存在时，Spring Boot会优先加载application.properties文件。 - 如果两个文件定义了相同的键，application.properties中的值将覆盖application.yml中的值（假设application.properties先被加载）。 - 如果一个键只存在于其中一个文件中，则该文件中的值将被使用。
+
 ---
 ### Q15 — 线程池隔离 vs 信号量隔离对比（找错误的）
 
-**来源:** 新版题库 Excel（2026-09-25 同步）
+**来源:** 每日一练 App
+**分类:** Spring Cloud
 
-**题目:** 关于线程池隔离和信号量隔离的对比说法错误的是?
+**题目:** 关于线程池隔离和信号量隔离的对比说法错误的是？
 
 **选项:**
 1. 信号量隔离请求处理线程和调用服务的线程是同一个线程，而线程池隔离请求处理线程和调用服务的线程不是同一个线程
@@ -521,13 +513,9 @@ public class RetryConfiguration {
 4. 线程池隔离不支持超时处理，而信号量隔离支持超时处理 ✅
 
 **我的答案:** 选项2 ❌
-
-**正确答案:** 选项4
+**正确答案:** 选项4（线程池隔离不支持超时处理，而信号量隔离支持超时处理）
 
 **解析:**
-- 线程池隔离支持超时处理，而信号量隔离不支持超时处理
-
-**原深度解析（App 版，供参考）:**
 - 选项4 说反了：**线程池隔离支持超时，信号量隔离不支持超时**——这正是两者的关键差异之一 ✅
   - **线程池隔离**：调用跑在独立线程池里，可通过 Future/超时机制**中断超时调用**，**支持超时处理**
   - **信号量隔离**：调用跑在**调用方自己的线程**里，无法从外部中断正在执行的线程，**不支持超时**（只能靠自身代码逻辑）
@@ -543,3 +531,15 @@ public class RetryConfiguration {
   | 异步 | 支持 | 不支持 |
   | 超时 | **支持** | **不支持** |
 - 记忆点：问“错误说法”时，看到**“线程池不支持超时”**→ 锁定，正确版本是“信号量不支持超时”
+
+---
+
+## 📊 第八周错题汇总
+
+| 日期 | 题数 | 答对 | 答错 |
+|:----:|:----:|:----:|:----:|
+| 09-06 | 15 | 4 | 11 |
+| **合计** | **15** | **4** | **11** |
+
+- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
+  解析：线程池隔离支持超时处理，而信号量隔离不支持超时处理
