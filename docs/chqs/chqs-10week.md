@@ -42,7 +42,7 @@
 3. ConcurrentHashMap
 4. CopyOnWriteArraySet
 
-**我的答案:** **我的答案:** 选项3（ConcurrentHashMap） ❌
+**我的答案:** 选项3（ConcurrentHashMap） ❌
 **正确答案:** 选项2（HashTable）✅
 
 **解析:**
@@ -124,7 +124,7 @@
 3. CA
 4. 私钥认证
 
-**我的答案:** **我的答案:** 选项2（公钥认证） ❌
+**我的答案:** 选项2（公钥认证） ❌
 **正确答案:** 选项4（私钥认证）✅
 
 **解析:**

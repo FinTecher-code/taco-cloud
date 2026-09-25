@@ -65,7 +65,7 @@
 3. `get`
 4. `set`
 
-**我的答案:** **我的答案:** 选项1（`info`） ✅
+**我的答案:** 选项1（`info`） ✅
 **正确答案:** `info`
 
 **解析:**
@@ -112,7 +112,7 @@
 3. 6
 4. 2
 
-**我的答案:** **我的答案:** 选项2（3） ❌
+**我的答案:** 选项2（3） ❌
 **正确答案:** 选项1（4）
 
 **解析:**
@@ -138,7 +138,7 @@
 
 
 - 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：``` SADD ca "php" "java" "go" "c" "ruby" "julia" #创建集合 ca:php java go c ruby julia SMOVE ca cb "julia" #把julia从ca移到cb中;cb:julia,ca:php java go c ruby SADD cb "ruby" ;添加元素;cb:julia ruby SDIFFSTORE cc ca cb #获取ca cb的差集 cc:php go c java SMOVE cc ca "php"  #把php从cc移到ca中 #cc:go c java #ca:php go c ruby SREM ca "go" "ruby" "julia" #删除元素;ca:php c SUNIONSTORE cd ca cc #获取ca cc的并集:cd:php go c java SCARD cd #输出cd的元素数量:4 ```
+  解析：SADD user "child" "student" "worker" 创建 user: child student worker；SADD person 创建 person: worker farmer child；SREM person "child" 输出 1，person: worker farmer；SDIFFSTORE diff user person 差集 diff: child student；SMOVE diff person "farmer"（farmer 不在 diff 中，失败输出 0，person 不变）；SCARD person 输出 2。
 
 ---
 ### Q5 — Tomcat Coyote 网络协议
@@ -319,7 +319,7 @@
 3. index
 4. separator
 
-**我的答案:** **我的答案:** 选项2（itif） ✅
+**我的答案:** 选项2（itif） ✅
 **正确答案:** 选项2 - `itif`
 
 **解析:**
@@ -363,7 +363,7 @@ SCARD cd
 3. 6
 4. 2
 
-**我的答案:** **我的答案:** 选项3（6） ❌
+**我的答案:** 选项3（6） ❌
 **正确答案:** `4`
 
 **解析:**
