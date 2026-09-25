@@ -98,30 +98,37 @@
 
 ### Q4 — Maven 常见依赖范围
 
-**来源:** 每日一练 App
+**来源:** 每日一练 App + 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 属于 Maven 常见的依赖范围选项的是？
+**题目:** 属于Maven常见的依赖范围选项的是？
+
+```
+1、compile
+2、test
+3、provided
+4、runtime
+```
 
 **选项:**
-1. compile、test、provided、runtime ✅
-2. compile、provided、runtime
-3. test、provided、runtime
-4. compile、test、runtime
+1. 1、2、3、4 ✅
+2. 1、3、4
+3. 2、3、4
+4. 1、2、4
 
 **我的答案:** 选项1 ✅
-**正确答案:** 选项1 ✅
+
+**正确答案:** 选项1（四个都属于常见依赖范围）
 
 **解析:**
-- Maven 常见的依赖范围（scope）有四个：**compile、test、provided、runtime**，全部正确 ✅
-- 各 scope 含义：
-  - **compile**：默认范围，编译/测试/运行都可用
-  - **test**：只在测试编译和执行阶段可用（如 JUnit）
-  - **provided**：编译和测试可用，运行时由容器/JDK 提供（如 servlet-api）
-  - **runtime**：运行和测试时可用，编译时不可用（如 JDBC 驱动）
-- 另有 system、import 等不常用范围，但题目问"常见"的，就是这四个
-- 记忆点：compile/test/provided/runtime，四件套全选
-
----
+- **官方解析（Excel）:**
+  1. **compile**:编译依赖，默认的依赖方式，在编译、运行测试、实际运行三个阶段都有效，典型如 spring-core
+  2. **test**:测试依赖，只在编译测试和运行测试有效，典型如 JUnit
+  3. **provided**:对编译和测试有效，不会打包进发布包，典型如 servlet-api（运行时由容器提供）
+  4. **runtime**:只在运行测试和实际运行时有效，典型如 JDBC 驱动 jar
+  5. system:不从 Maven 仓库获取 jar，通过 systemPath 指定路径
+  6. import:用于 dependencyManagement 之间的继承（POM 中）
+- **深度补充:** 常见的就是 compile/test/provided/runtime 四件套；system 和 import 较少见
+- 记忆点：四个全选，别把 provided/runtime 排除掉
 
 ---
 
