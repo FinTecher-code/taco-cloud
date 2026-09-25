@@ -27,8 +27,7 @@
 - DBA 是数据库管理员职位,不是用户
 - admin 是常见用户名,但不是 MySQL 预设超级用户
 
-  解析：root是mysql默认的拥有最高权限的用户
-
+- **官方补充（Excel）:** root是mysql默认的拥有最高权限的用户
 ---
 
 ### Q2 — MySQL BETWEEN 区间查询
@@ -51,8 +50,6 @@
 - `IN INTERVAL` 不是 MySQL 合法语法
 - `BETWEEN 0 AND 11` 范围过大,不符合要求
 
-  解析：待补充
-
 ---
 
 ### Q3 — MySQL 水平分区模式
@@ -74,13 +71,9 @@
 - Range 分区是最常用的水平分区模式,允许 DBA 将数据按范围划分
 - 例如按年份分区:80年代、90年代、2000年代等
 - 其他分区方式各有适用场景,但 Range 是使用最广泛的
+- **官方补充（Excel）:** - Range（范围） – 这种模式允许DBA将数据划分不同范围，一般经常用到此模式的分区。例如DBA可以将一个表通过年份划分成三个分区，80年代（1980's）的数据，90年代（1990's）的数据以及任何在2000年（包括2000年）后的数据。  - Hash（哈希）  – 这种模式允许DBA通过对表的一个或多个列的Hash Key进行计算，最后通过这个Hash码不同数值对应的数据区域进行分区。例如DBA可以建立一个对表主键进行分区的表。  - Key（键值）    – Hash模式的一种延伸，这里的Hash Key是MySQL系统产生的。  - List（预定义列表） – 这种模式允许系统通过DBA定义的列表的值所对应的行数据进行分割。例如：DBA建立了一个横跨三个分区的表，分别根据2004年2005年和2006年值所对应的数据。  - Composite（复合模式） - 很神秘吧，哈哈，其实是以上模式的组合使用而已，就不解释了。举例：在初始化已经进行了Range范围分区的表上，我们可以对其中一个分区再进行hash哈希分区。
 
----
-
-## 2026-07-28
-
-  解析：- Range（范围） – 这种模式允许DBA将数据划分不同范围，一般经常用到此模式的分区。例如DBA可以将一个表通过年份划分成三个分区，80年代（1980's）的数据，90年代（1990's）的数据以及任何在2000年（包括2000年）后的数据。  - Hash（哈希）  – 这种模式允许DBA通过对表的一个或多个列的Hash Key进行计算，最后通过这个Hash码不同数值对应的数据区域进行分区。例如DBA可以建立一个对表主键进行分区的表。  - Key（键值）    – Hash模式的一种延伸，这里的Hash Key是MySQL系统产生的。  - List（预定义列表） – 这种模式允许系统通过DBA定义的列表的值所对应的行数据进行分割。例如：DBA建立了一个横跨三个分区的表，分别根据2004年2005年和2006年值所对应的数据。  - Composite（复合模式） - 很神秘吧，哈哈，其实是以上模式的组合使用而已，就不解释了。举例：在初始化已经进行了Range范围分区的表上，我们可以对其中一个分区再进行hash哈希分区。
-
+----
 ---
 
 ### Q4 — 给已有表添加主键约束
@@ -111,41 +104,19 @@
 **题目:** MyISAM 表 user(字段 id, name, email),name 和 email 均已建全文索引,最有效查询关键词的写法是?
 
 **选项:**
-1. 
-  ```  
-  SELECT id, name FROM user WHERE name LIKE '%关键词%' OR email LIKE '%关键词%';  
-    
-  ```
-2. 
-  ```  
-  SELECT id, name FROM user WHERE MATCH(name, email) AGAINST('关键词' IN BOOLEAN MODE);  
-    
-  ``` ✅
-3. 
-  ```  
-  SELECT id, name FROM user WHERE MATCH(name) AGAINST('关键词' IN BOOLEAN MODE) OR MATCH(email) AGAINST('关键词' IN BOOLEAN MODE);  
-    
-  ```
-4. 
-  ```  
-  SELECT id, name FROM user WHERE MATCH(name) AGAINST('关键词' IN BOOLEAN MODE) UNION SELECT id, name FROM user WHERE MATCH(email) AGAINST('关键词' IN BOOLEAN MODE);  
-    
-  ```
+1. SELECT id, name FROM user WHERE name LIKE '%关键词%' OR email LIKE '%关键词%';
+2. SELECT id, name FROM user WHERE MATCH(name, email) AGAINST('关键词' IN BOOLEAN MODE); ✅
+3. SELECT id, name FROM user WHERE MATCH(name) AGAINST('关键词' IN BOOLEAN MODE) OR MATCH(email) AGAINST('关键词' IN BOOLEAN MODE);
+4. SELECT id, name FROM user WHERE MATCH(name) AGAINST('关键词' IN BOOLEAN MODE) UNION SELECT id, name FROM user WHERE MATCH(email) AGAINST('关键词' IN BOOLEAN MODE);
 
 **我的答案:** 选项2 ✅
-**正确答案:** 选项2（```）
+**正确答案:** 选项2
 
 **解析:**
 - `LIKE '%关键词%'` 无法走索引,大表性能差
 - 选项2 使用**联合全文索引** `MATCH(name, email)`,一次检索两列,效率最高
 - 选项3、4 虽然也用了全文索引,但需要拆成两次检索
 - MyISAM 支持全文索引,`IN BOOLEAN MODE` 支持布尔运算符
-
----
-
-## 2026-07-31
-
-  解析：``` SELECT id, name FROM user WHERE MATCH(name, email) AGAINST('关键词' IN BOOLEAN MODE);  ``` 这个选项正确，这个选项使用了一个MATCH函数，并且使用了布尔模式，所以可以利用索引，而且只需要一次查询，性能最优。  ``` SELECT id, name FROM user WHERE name LIKE '%关键词%' OR email LIKE '%关键词%';  ``` 这个选项错误，这个选项使用了LIKE操作符，但是由于使用了%作为前缀和后缀，所以无法利用索引，会导致全表扫描，性能很差。  ``` SELECT id, name FROM user WHERE MATCH(name) AGAINST('关键词' IN BOOLEAN MODE) OR MATCH(email) AGAINST('关键词' IN BOOLEAN MODE);  ``` 这个选项错误，这个选项使用了两个MATCH函数，但是由于使用了OR连接，所以也无法利用索引，会导致全表扫描，性能很差。  ``` SELECT ……
 
 ---
 
@@ -183,10 +154,10 @@
 **题目:** 基于 GTID 的主从切换过程中,如何确保数据一致性?
 
 **选项:**
-1. 检查主库和从库的 binlog 文件大小是否一致 ❌
-2. 等待所有从库应用完主库的 GTID 事务 ✅
-3.
-4.
+1. 检查主从库的binlog文件大小是否一致 ❌
+2. 等待所有从库应用完主库的GTID事务 ✅
+3. 对比主从库的表数据checksum
+4. 重置从库的GTID集合以匹配新主库
 
 **我的答案:** 选项1 ❌
 **正确答案:** 选项2
@@ -291,12 +262,7 @@
 **关键记忆:**
 > TDSQL 实例规格灵活：**一主一从、一主两从**都支持，没有“必须一主两从”的说法
 
----
-
-## 2026-08-01
-
-  解析：正确答案：创建实例是必须创建一主两从的规格。答案解析：这个选项是错误的，在创建实例是，可以根据资源灵活的选取一主一从，一主两从，一主三从的规格。
-
+- **官方补充（Excel）:** 正确答案：创建实例是必须创建一主两从的规格。答案解析：这个选项是错误的，在创建实例是，可以根据资源灵活的选取一主一从，一主两从，一主三从的规格。
 ---
 
 ### Q11 — 分析 JVM Native Memory 泄漏的工具
@@ -327,8 +293,9 @@
 > - 堆内对象/GC → `jmap -histo` / `jstat`
 > - 线程/死锁 → `jstack`
 
-  解析：正确答案是：`jcmd <pid> VM.native_memory`。jcmd的VM.native_memory支持Native Memory追踪。 其它分别为分析堆对象；获取线程栈和监控GC。
+ 其它分别为分析堆对象；获取线程栈和监控GC。
 
+- **官方补充（Excel）:** 正确答案是：`jcmd <pid> VM.native_memory`。jcmd的VM.native_memory支持Native Memory追踪。
 ---
 
 ### Q12 — JVM 优化参数描述(选错 ❌)
@@ -358,7 +325,6 @@
 > - **`-Xmn` = 年轻代大小**
 > - 常见陷阱:把 `-Xmx` 说成"初始堆内存"是错误描述
 
-  解析：“-Xmx1200m“ 表示设置 JVM 最大堆内存为 1200M
 ### Q13 — 服务器内存充足但 JVM 内存耗尽的原因
 
 **来源:** 每日一练 App
@@ -384,7 +350,6 @@
 > 物理内存充足但 JVM OOM → 查 **JVM 参数配置**(`-Xmx` 等),不是系统问题
 > 区分:系统内存不足(OS 层面) vs JVM 内存不足(JVM 堆配置层面)
 
-  解析：JVM的内存配置可能不够大，导致在可用内存充足的情况下仍无法为JVM分配足够的堆内存。
 ### Q14 — G1 垃圾回收器描述(选错 ❌)
 
 **来源:** 每日一练 App
@@ -439,6 +404,9 @@
 > OOM 排查三板斧：**top → jps -l → jstack（/jmap）**
 > `ls` 只是列目录的命令，与 JVM 无关，纯迷惑项
 
+- **官方补充（Excel）:** “-Xmx1200m“ 表示设置 JVM 最大堆内存为 1200M
+- **官方补充（Excel）:** JVM的内存配置可能不够大，导致在可用内存充足的情况下仍无法为JVM分配足够的堆内存。
+- **官方补充（Excel）:** 线上 JVM 堆内存溢出（OOM）分析步骤： 1. 通过 top 命令查看 cpu 和内存占比情况，找到占用最多的 PID：top ； 2. 通过 jps -l 列出所有的运行的 Java 程序，可以看到步骤 1 中的 PID 对应的 Java 程序：jps -l ； 3. 通过 ps 查看具体的 JVM 线程：ps -mp [ 线程号 ] -o THREAD , tid , time ； 4. 通过 jstack 查看 Java 中具体线程栈信息：jstack [ 进程ID ] | grep [ 线程的16进制id ] -A 行数 ； 6. 通过 jstat 查看内存回收情况： jstat -gcutil 线程 ID 间隔毫秒数 次数。
 ---
 
 ## 📊 第四周错题汇总
@@ -451,4 +419,3 @@
 | 08-01 | 5 | 3 | 2 |
 | **合计** | **15** | **10** | **5** |
 
-  解析：线上 JVM 堆内存溢出（OOM）分析步骤： 1. 通过 top 命令查看 cpu 和内存占比情况，找到占用最多的 PID：top ； 2. 通过 jps -l 列出所有的运行的 Java 程序，可以看到步骤 1 中的 PID 对应的 Java 程序：jps -l ； 3. 通过 ps 查看具体的 JVM 线程：ps -mp [ 线程号 ] -o THREAD , tid , time ； 4. 通过 jstack 查看 Java 中具体线程栈信息：jstack [ 进程ID ] | grep [ 线程的16进制id ] -A 行数 ； 6. 通过 jstat 查看内存回收情况： jstat -gcutil 线程 ID 间隔毫秒数 次数。
