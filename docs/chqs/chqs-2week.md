@@ -372,43 +372,46 @@ SCARD cd
 
 ### Q13 — MyBatis 动态 SQL 说法
 
-**来源:** 每日一练 App
+**来源:** 每日一练 App + 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 关于以下 MyBatis 动态 SQL，说法不正确的是？
+**题目:** 关于下面的代码，选项说法不正确的是？
 
 ```xml
-<select id="selectByUser" parameterType="com.tgb.mybatis.entity.SysUser"
-        resultType="com.tgb.mybaits.entity.Sysuser">
-  select
-    user_name "userName",
-    user_password "userPassword",
-    user_info "userInfo",
-    head_img "headImg",
-    create_time "createTime"
-  from sys_user
-  where 1=1
-  <if test="userName != null and userName != ''">
-    and user_name like CONCAT('%',#{userName},'%')
-  </if>
-  <if test="userEmail != null and userEmail != ''">
-    and user_email = #{userEmail}
-  </if>
+<select id="selectByUser" parameterType="com.tgb.mybatis.entity.SysUser" resultType="com.tgb.mybatis.entity.SysUser">
+    select
+        user_name "userName",
+        user_password "userPassword",
+        user_info "userInfo",
+        head_img "headImg",
+        create_time "createTime"
+    from
+        sys_user
+    where
+        1=1
+        <if test="userName != null and userName !=''">
+          and user_name like CONCAT('%',#{userName},'%')
+        </if>
+        <if test="userEmail != null and userEmail != ''">
+          and user_email =#{userEmail}
+        </if>
 </select>
 ```
 
 **选项:**
-1. `where 1=1` 防止所有 if 都不满足时 SQL 拼接出错 ✅
-2. `property != null` 适用于任意字段类型 ✅
-3. `property != null`（不判空串）只适用于 int 类型，不能检查空串 ❌（**不正确的说法**）
-4. 用 `and`/`or` 连接多个 SQL 条件 ✅
+1. `1=1` 是为了避免当 if 条件判断都为 false 时不出错，该条件始终成立
+2. `property != null` 或 `property == null` 适用于任何类型的字段，用于判断属性值是否为空
+3. `property != ` 或 `property == ` 仅用于判断 int 类型的字段，无法判断是否为空字符串 ✅（本题=选不正确的）
+4. `and` 和 `or`：当多个条件判断时，使用 `and` 或 `or` 连接 SQL
 
 **我的答案:** 选项3 ✅
-**正确答案:** 选项3
+
+**正确答案:** 选项3（不正确的说法）
 
 **解析:**
-- 选项③的错误在于：`int` 是基本类型，**永远不可能为 null**，判 `!= null` 永远返回 true，反而会出问题
-- 反而是 `Integer`（包装类型）可以判 null，适用于所有引用类型
-- 所以这句话**前后说反了**——判 null 适合引用类型，对 `int` 基本类型无意义
+- **官方解析（Excel）:** `property != ""` 或 `property == ""` 适用于字符串类型判断，并不适用于 int 类型。MyBatis 的 mapper 接口如果传入基本类型，会在动态代理时被转换成对应的包装类。
+- 也就是说，**判“!= ''” 只对字符串有意义**；说它“仅用于判断 int 类型”是反了，属于不正确说法
+- **深度补充:** 选项2 其实也埋着考点——`int` 是基本类型永远不为 null，判 `!= null` 对 `int` 无意义（要判空得用包装类型 Integer）；但本题要选“最不正确”的，Excel 标准答案是选项3
+- 记忆点：`!= null` 看类型（引用类型才有意义）；`!= ''` 看内容（只对字符串有意义）
 
 ---
 
