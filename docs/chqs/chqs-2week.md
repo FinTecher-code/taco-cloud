@@ -72,6 +72,24 @@
 **解析:**
 - 看Redis使用情况及状态信息用info
 
+**原深度解析（App 版，供参考）:**
+- `INFO` 命令用于查看 Redis 服务器的各种信息，包括：
+  - 服务器基本信息（版本、进程 ID 等）
+  - 内存使用情况
+  - 客户端连接数
+  - 持久化状态（RDB/AOF）
+  - 统计信息（命中率、每秒请求数等）
+  - 复制/集群状态
+- **常用变体：**
+  - `INFO server` — 只查看服务器信息
+  - `INFO memory` — 只查看内存
+  - `INFO stats` — 只查看统计
+  - `INFO ALL` — 查看所有信息
+- **干扰项分析：**
+  - `informa` — 不存在此命令
+  - `get` — 获取键值对
+  - `set` — 设置键值对
+
 ---
 ### Q4 — Redis 命令执行过程分析
 
@@ -124,6 +142,27 @@
 - 4. **创建.ssh 目录**：在用户家目录下创建`.ssh`文件夹（`mkdir ~/.ssh`），用于存储密钥文件。
 - 5. **进入.ssh 目录**：通过`cd .ssh`进入该目录，后续生成的密钥将保存在这里。
 - 6. **生成密钥**：执行`ssh-keygen -t rsa -C "邮箱地址"`生成 ssh 密钥，按回车完成操作。
+
+**原深度解析（App 版，供参考）:**
+- **逐步推导：**
+  | 步骤 | 命令 | 执行结果 | 当前状态 |
+  |------|------|---------|---------|
+  | 1 | `SADD user "child" "student" "worker"` | 返回 3（新加 3 个） | user = {child, student, worker} |
+  | 2 | `SADD person "worker" "farmer" "child"` | 返回 2（farmer 为新加） | person = {worker, farmer, child} |
+  | 3 | `SREM person "child"` | 返回 1（成功移除） | person = {worker, farmer} |
+  | 4 | `SDIFFSTORE diff user person` | 返回 2（存了 2 个元素） | diff = {child, student}（差集） |
+  | 5 | `SMOVE diff person "farmer"` | 返回 **0**（farmer 不在 diff 中） | diff/person 不变 ❗ |
+  | 6 | `SCARD person` | 返回 **2**（person 有 2 个元素） | person = {worker, farmer} |
+- **逐项验证选项：**
+  - ✅ `diff` 确实为 {child, student}，两个元素
+  - ❌ `SMOVE` 失败返回 0，不是 1
+  - ❌ `SCARD person` 输出 2，不是 3
+  - ❌ `SREM` 成功返回 1，不是 0
+- **关键考点：**
+  - `SDIFFSTORE` 计算差集并存储（user - person）
+  - `SMOVE` 元素必须在源集合中才能移动，否则返回 0
+  - `SREM` 移除存在的元素返回 1，不存在返回 0
+  - 一步步推算集合状态，不要凭感觉跳步
 
 ---
 ### Q5 — Tomcat Coyote 网络协议
@@ -212,6 +251,12 @@
 - - Connector 通过 Engine 传递请求给 Host：不准确，Engine 只是管理 Host，真正分发请求的还是 Connector。
 - - Container 解析请求后，传递给 Connector 进行处理：Container 负责请求分发，不负责解析 HTTP 请求。
 
+**原深度解析（App 版，供参考）:**
+- **Connector** 负责接收并**解析 HTTP 请求**，将其封装为 `Request`/`Response` 对象
+- 解析后交给 **Container 容器顶层（Engine）** 处理
+- Engine → Host → Context → Wrapper 逐级向下分发
+- Connector 不直接跟 Context 打交道，Container 也不干解析的活
+
 ---
 ### Q8 — Tomcat 顶层容器
 
@@ -232,6 +277,13 @@
 **解析:**
 - onto参数后面是新的基
 
+**原深度解析（App 版，供参考）:**
+- **Server** 是 Tomcat 最顶层组件，代表**整个 Tomcat 实例**
+- 一个 Server 可以包含**多个 Service**
+- 每个 Service 包含若干 Connector + 一个 Engine
+- Engine → Host → Context → Wrapper 都在 Server 管理之下
+- Engine 是 Container 的顶层，但不是整个 Tomcat 实例的顶层
+
 ---
 ### Q9 — Tomcat ProtocolHandler 组件
 
@@ -251,6 +303,13 @@
 
 **解析:**
 - ProtocolHandler包含了三个非常重要的组件：Endpoint、Processor、Adapter
+
+**原深度解析（App 版，供参考）:**
+- ProtocolHandler 的**三个核心组件**是：**Endpoint**、**Processor**、**Adapter**
+- **Endpoint**：处理底层网络 I/O（Socket 连接）
+- **Processor**：解析 HTTP 请求报文
+- **Adapter**：将解析后的请求适配给 Container 处理
+- **Request** 是 Processor 解析后产生的对象，不是 ProtocolHandler 的组件
 
 ---
 ### Q10 — MyBatis Resources 加载配置
@@ -280,6 +339,11 @@
 **解析:**
 - Resources类是 MyBatis 提供的用于加载类路径下资源的工具类，getResourceAsStream()方法可以将类路径下的资源文件以输入流的形式返回，这在构建SqlSessionFactory时，方便将配置文件传递给SqlSessionFactoryBuilder的build()方法。loadResource、openResource和readResource都不是Resources类中用于获取类路径下资源文件输入流的正确方法。
 
+**原深度解析（App 版，供参考）:**
+- MyBatis 的 `org.apache.ibatis.io.Resources` 工具类，从 classpath 加载资源用的是 **`getResourceAsStream()`**
+- 用法：`Resources.getResourceAsStream("mybatis-config.xml")`
+- `loadResource`、`openResource`、`readResource` 都不是 Resources 类的方法
+
 ---
 ### Q11 — MyBatis foreach 标签属性
 
@@ -299,6 +363,19 @@
 
 **解析:**
 - itif 不是 MyBatis 的标签或属性
+
+**原深度解析（App 版，供参考）:**
+- MyBatis `<foreach>` 标签的有效属性共 6 个：
+  | 属性 | 说明 |
+  |------|------|
+  | `collection` | 必填，要遍历的集合/数组名 |
+  | `item` | 每次迭代的元素变量名 |
+  | `index` | 当前索引（从0开始） |
+  | `open` | 开头字符串，如 `(` |
+  | `close` | 结尾字符串，如 `)` |
+  | `separator` | 元素之间的分隔符，如 `,` |
+- **`itif`** 不是任何合法属性名，纯干扰项
+- `collection` 是必填属性，`index` 和 `separator` 都是可选合法属性
 
 ---
 ### Q12 — Redis SCARD 集合运算
@@ -352,6 +429,22 @@
 - 4. **创建.ssh 目录**：在用户家目录下创建`.ssh`文件夹（`mkdir ~/.ssh`），用于存储密钥文件。
 - 5. **进入.ssh 目录**：通过`cd .ssh`进入该目录，后续生成的密钥将保存在这里。
 - 6. **生成密钥**：执行`ssh-keygen -t rsa -C "邮箱地址"`生成 ssh 密钥，按回车完成操作。
+
+**原深度解析（App 版，供参考）:**
+- **逐步推导：**
+  | 步骤 | 命令 | ca | cb | cc | cd |
+  |------|------|:--:|:--:|:--:|:--:|
+  | ① | `SADD ca 6个元素` | {php,java,go,c,ruby,julia} | ∅ | ∅ | ∅ |
+  | ② | `SMOVE ca→cb julia` | {php,java,go,c,ruby} | {julia} | ∅ | ∅ |
+  | ③ | `SADD cb ruby` | {php,java,go,c,ruby} | {julia,ruby} | ∅ | ∅ |
+  | ④ | `SDIFFSTORE cc ca⊖cb` | {php,java,go,c,ruby} | {julia,ruby} | **{php,java,go,c}** | ∅ |
+  | ⑤ | `SMOVE cc→ca php` | {php,java,go,c,ruby} | {julia,ruby} | {java,go,c} | ∅ |
+  | ⑥ | `SREM ca go ruby julia` | **{php,java,c}** | {julia,ruby} | {java,go,c} | ∅ |
+  | ⑦ | `SUNIONSTORE cd ca∪cc` | {php,java,c} | {julia,ruby} | {java,go,c} | **{php,java,c,go}** |
+  | ⑧ | `SCARD cd` | | | | **→ 4** |
+- **关键细节：**
+  - 步骤⑥：`julia` 早已不在 ca 中（步骤②已移到 cb），所以只移除了 `go` 和 `ruby`，ca 剩下 {php, java, c}
+  - 步骤⑦：并集 {php, java, c} ∪ {java, go, c} = {php, java, c, go}，共 4 个元素
 
 ---
 ### Q13 — MyBatis 动态 SQL 说法
