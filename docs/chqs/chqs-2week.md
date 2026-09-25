@@ -55,9 +55,9 @@
 
 ### Q3 — Redis 查看状态信息的命令
 
-**来源:** 每日一练 App
+**来源:** 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 查看 Redis 使用情况及状态信息的命令是？
+**题目:** 查看Redis使用情况及状态信息的命令是？
 
 **选项:**
 1. `info` ✅
@@ -65,80 +65,65 @@
 3. `get`
 4. `set`
 
-**我的答案:** 选项1（`info`） ✅
-**正确答案:** `info`
+**我的答案:** 选项1 ✅
+
+**正确答案:** 选项1
 
 **解析:**
-- `INFO` 命令用于查看 Redis 服务器的各种信息，包括：
-  - 服务器基本信息（版本、进程 ID 等）
-  - 内存使用情况
-  - 客户端连接数
-  - 持久化状态（RDB/AOF）
-  - 统计信息（命中率、每秒请求数等）
-  - 复制/集群状态
-- **常用变体：**
-  - `INFO server` — 只查看服务器信息
-  - `INFO memory` — 只查看内存
-  - `INFO stats` — 只查看统计
-  - `INFO ALL` — 查看所有信息
-- **干扰项分析：**
-  - `informa` — 不存在此命令
-  - `get` — 获取键值对
-  - `set` — 设置键值对
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：看Redis使用情况及状态信息用info
+- 看Redis使用情况及状态信息用info
 
 ---
 ### Q4 — Redis 命令执行过程分析
 
-**来源:** 每日一练 App
+**来源:** 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 下列 Redis 命令执行过程描述正确的是？
-
-```text
-1  SADD        user      "child"    "student"    "worker"
-2  SADD        person    "worker"   "farmer"     "child"
-3  SREM        person                "child"
-4  SDIFFSTORE  diff      user        person
-5  SMOVE       diff      person      "farmer"
-6  SCARD       person
-```
+**题目:** Git 生成 ssh 公钥的正确步骤是？
 
 **选项:**
-1. 4 ✅
-2. 3
-3. 6
-4. 2
+1. 1. 下载git 
+    2. 安装
+    3. 点击Git Base Here   输入`cd ~`
+    4. 创建文件夹`mkdir ~/.ssh`
+    5. 进入文件夹`cd .ssh`
+    6. 配置全局的name和email
+    7. 生成key
+    8. 回车
+2. 1. 下载git 
+    2. 安装
+    3. 配置全局的name和email
+    4. 创建文件夹`mkdir ~/.ssh`
+    5. 进入文件夹`cd .ssh`
+    6. 点击Git Base Here   输入`cd ~`
+    7. 生成key
+    8. 回车
+3. 1. 下载git 
+    2. 安装
+    3. 配置全局的name和email
+    4. 点击Git Base Here   输入`cd ~`
+    5. 创建文件夹`mkdir ~/.ssh`
+    6. 进入文件夹`cd .ssh`
+    7. 生成key
+    8. 回车 ✅
+4. 1. 下载git 
+    2. 安装
+    3. 创建文件夹`mkdir ~/.ssh`
+    4. 点击Git Base Here   输入`cd ~`
+    5. 进入文件夹`cd .ssh`
+    6. 配置全局的name和email
+    7. 生成key
+    8. 回车
 
-**我的答案:** 选项2（3） ❌
-**正确答案:** 选项1（4）
+**我的答案:** 选项1 ❌
+
+**正确答案:** 选项3
 
 **解析:**
-- **逐步推导：**
-  | 步骤 | 命令 | 执行结果 | 当前状态 |
-  |------|------|---------|---------|
-  | 1 | `SADD user "child" "student" "worker"` | 返回 3（新加 3 个） | user = {child, student, worker} |
-  | 2 | `SADD person "worker" "farmer" "child"` | 返回 2（farmer 为新加） | person = {worker, farmer, child} |
-  | 3 | `SREM person "child"` | 返回 1（成功移除） | person = {worker, farmer} |
-  | 4 | `SDIFFSTORE diff user person` | 返回 2（存了 2 个元素） | diff = {child, student}（差集） |
-  | 5 | `SMOVE diff person "farmer"` | 返回 **0**（farmer 不在 diff 中） | diff/person 不变 ❗ |
-  | 6 | `SCARD person` | 返回 **2**（person 有 2 个元素） | person = {worker, farmer} |
-- **逐项验证选项：**
-  - ✅ `diff` 确实为 {child, student}，两个元素
-  - ❌ `SMOVE` 失败返回 0，不是 1
-  - ❌ `SCARD person` 输出 2，不是 3
-  - ❌ `SREM` 成功返回 1，不是 0
-- **关键考点：**
-  - `SDIFFSTORE` 计算差集并存储（user - person）
-  - `SMOVE` 元素必须在源集合中才能移动，否则返回 0
-  - `SREM` 移除存在的元素返回 1，不存在返回 0
-  - 一步步推算集合状态，不要凭感觉跳步
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：SADD user "child" "student" "worker" 创建 user: child student worker；SADD person 创建 person: worker farmer child；SREM person "child" 输出 1，person: worker farmer；SDIFFSTORE diff user person 差集 diff: child student；SMOVE diff person "farmer"（farmer 不在 diff 中，失败输出 0，person 不变）；SCARD person 输出 2。
+- 1. **下载并安装 Git**：首先需要获取 Git 工具并完成安装，这是基础环境准备。
+- 2. **配置全局用户信息**：通过`git config --global user.name`和`user.email`设置用户名和邮箱，这是 Git 提交代码时的身份标识，应在生成密钥前配置。
+- 3. **打开 Git 命令行并进入用户目录**：点击`Git Bash Here`打开命令行，输入`cd ~`进入当前用户的家目录（后续操作均基于此目录）。
+- 4. **创建.ssh 目录**：在用户家目录下创建`.ssh`文件夹（`mkdir ~/.ssh`），用于存储密钥文件。
+- 5. **进入.ssh 目录**：通过`cd .ssh`进入该目录，后续生成的密钥将保存在这里。
+- 6. **生成密钥**：执行`ssh-keygen -t rsa -C "邮箱地址"`生成 ssh 密钥，按回车完成操作。
 
 ---
 ### Q5 — Tomcat Coyote 网络协议
@@ -203,62 +188,56 @@
 
 ### Q7 — Tomcat Connector 与 Container 交互
 
-**来源:** 每日一练 App
+**来源:** 新版题库 Excel（2026-09-25 同步）
 
-**题目:** Tomcat 中 Connector 和 Container 是怎样交互的？
+**题目:** Tomcat Connector 和 Container 交互的方式是什么？
 
 **选项:**
-1. Engine
-2. Host
-3. Server ✅
-4. Connector
+1. Connector 直接将请求交给 Context 处理
+2. Connector 通过 Engine 传递请求给 Host
+3. Connector 解析 HTTP 请求后，将其交给 Engine 处理 ✅
+4. Container 解析请求后，传递给 Connector 进行处理
 
 **我的答案:** 选项3 ✅
-**正确答案:** 选项3（Server）
+
+**正确答案:** 选项3
 
 **解析:**
-- **Connector** 负责接收并**解析 HTTP 请求**，将其封装为 `Request`/`Response` 对象
-- 解析后交给 **Container 容器顶层（Engine）** 处理
-- Engine → Host → Context → Wrapper 逐级向下分发
-- Connector 不直接跟 Context 打交道，Container 也不干解析的活
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：正确答案：Server  正确选项解析：  *Server 是正确答案。Server是Tomcat架构中的顶级组件，代表整个Tomcat实例。它负责管理一个或多个Service组件，并提供了Tomcat的启动、停止等生命周期管理功能。  错误选项解析：  *Engine是Service的子组件，负责处理请求并管理多个Host，但它不管理整个Tomcat实例。  *Host是Engine的子组件，代表一个虚拟主机，用于部署和管理Web应用程序，但它不管理整个Tomcat实例。  *Connector是Service的子组件，负责处理特定协议（如HTTP/HTTPS）的请求，但它不管理整个Tomcat实例。
+- 正确答案：
+- Connector 解析 HTTP 请求后，将其交给 Engine 处理
+- 理由：
+- Connector 解析 HTTP 请求后，将其封装成 Request，然后交给 Engine，Engine 进一步分发给 Host -> Context -> Servlet。
+- 错误答案：
+- - Connector 直接将请求交给 Context 处理：请求需要经过 Engine 和 Host 处理后才会到达 Context。
+- - Connector 通过 Engine 传递请求给 Host：不准确，Engine 只是管理 Host，真正分发请求的还是 Connector。
+- - Container 解析请求后，传递给 Connector 进行处理：Container 负责请求分发，不负责解析 HTTP 请求。
 
 ---
 ### Q8 — Tomcat 顶层容器
 
-**来源:** 每日一练 App
+**来源:** 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 哪个组件是顶层容器，管理多个 Service，代表整个 Tomcat 实例？
+**题目:** 取出 client 分支，找出处于 client 分支和 server 分支的共同祖先之后的修改，然后把它们在 master 分支上重放一遍。以下哪个命令能达到上述效果？
 
 **选项:**
-1. Engine
-2. Host
-3. Server ✅
-4. Connector
+1. git rebase --onto master server client ✅
+2. git rebase --onto server client master
+3. git rebase --onto master client server
+4. git rebase --onto client server master
 
-**我的答案:** 选项3 ✅
-**正确答案:** Server
+**我的答案:** 选项1 ✅
+
+**正确答案:** 选项1
 
 **解析:**
-- **Server** 是 Tomcat 最顶层组件，代表**整个 Tomcat 实例**
-- 一个 Server 可以包含**多个 Service**
-- 每个 Service 包含若干 Connector + 一个 Engine
-- Engine → Host → Context → Wrapper 都在 Server 管理之下
-- Engine 是 Container 的顶层，但不是整个 Tomcat 实例的顶层
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：正确答案：Server  正确选项解析：  *Server 是正确答案。Server是Tomcat架构中的顶级组件，代表整个Tomcat实例。它负责管理一个或多个Service组件，并提供了Tomcat的启动、停止等生命周期管理功能。  错误选项解析：  *Engine是Service的子组件，负责处理请求并管理多个Host，但它不管理整个Tomcat实例。  *Host是Engine的子组件，代表一个虚拟主机，用于部署和管理Web应用程序，但它不管理整个Tomcat实例。  *Connector是Service的子组件，负责处理特定协议（如HTTP/HTTPS）的请求，但它不管理整个Tomcat实例。
+- onto参数后面是新的基
 
 ---
 ### Q9 — Tomcat ProtocolHandler 组件
 
-**来源:** 每日一练 App
+**来源:** 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 以下哪个**不是** ProtocolHandler 的三个重要组件之一？
+**题目:** `ProtocolHandler`包含了三个非常重要的组件，下列选项中错误的是？
 
 **选项:**
 1. `Endpoint`
@@ -266,52 +245,47 @@
 3. `Adapter`
 4. `Request` ✅
 
-**我的答案:** 未记录具体选项（原记录状态：❌ 答错）
-**正确答案:** Request
+**我的答案:** （当时未记录具体选项，原记录标 ❌ 答错）
+
+**正确答案:** 选项4
 
 **解析:**
-- ProtocolHandler 的**三个核心组件**是：**Endpoint**、**Processor**、**Adapter**
-- **Endpoint**：处理底层网络 I/O（Socket 连接）
-- **Processor**：解析 HTTP 请求报文
-- **Adapter**：将解析后的请求适配给 Container 处理
-- **Request** 是 Processor 解析后产生的对象，不是 ProtocolHandler 的组件
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：ProtocolHandler包含了三个非常重要的组件：Endpoint、Processor、Adapter
+- ProtocolHandler包含了三个非常重要的组件：Endpoint、Processor、Adapter
 
 ---
 ### Q10 — MyBatis Resources 加载配置
 
-**来源:** 每日一练 App
+**来源:** 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 使用 `Resources` 类的哪个方法从 classpath 加载 `mybatis-config.xml` 来构建 `SqlSessionFactory`？
+**题目:** 在构建SqlSessionFactory时，如果配置文件mybatis-config.xml位于类路径下，使用Resources类加载该文件的正确方式是？
 
 **选项:**
-1. `getResourceAsStream` ✅
-2. `loadResource` ❌（我选的）
-3. `openResource`
-4. `readResource`
+1. ```
+    Resources.getResourceAsStream("mybatis-config.xml")
+    ``` ✅
+2. ```
+    Resources.loadResource("mybatis-config.xml")
+    ```
+3. ```
+    Resources.openResource("mybatis-config.xml")
+    ```
+4. ```
+    Resources.readResource("mybatis-config.xml")
+    ```
 
-**我的答案:** `loadResource` ❌
-**正确答案:** `Resources.getResourceAsStream()`
+**我的答案:** 选项2 ❌
+
+**正确答案:** 选项1
 
 **解析:**
-- MyBatis 的 `org.apache.ibatis.io.Resources` 工具类，从 classpath 加载资源用的是 **`getResourceAsStream()`**
-- 用法：`Resources.getResourceAsStream("mybatis-config.xml")`
-- `loadResource`、`openResource`、`readResource` 都不是 Resources 类的方法
+- Resources类是 MyBatis 提供的用于加载类路径下资源的工具类，getResourceAsStream()方法可以将类路径下的资源文件以输入流的形式返回，这在构建SqlSessionFactory时，方便将配置文件传递给SqlSessionFactoryBuilder的build()方法。loadResource、openResource和readResource都不是Resources类中用于获取类路径下资源文件输入流的正确方法。
 
 ---
-
-## 2026-07-19
-
----
-
 ### Q11 — MyBatis foreach 标签属性
 
-**来源:** 每日一练 App
+**来源:** 新版题库 Excel（2026-09-25 同步）
 
-**题目:** MyBatis `<foreach>` 标签不包含哪个属性？
+**题目:** `<foreach>`标签不包含以下哪个属性?
 
 **选项:**
 1. collection
@@ -319,72 +293,65 @@
 3. index
 4. separator
 
-**我的答案:** 选项2（itif） ✅
-**正确答案:** 选项2 - `itif`
+**我的答案:** 选项2 ✅
+
+**正确答案:** 选项2
 
 **解析:**
-- MyBatis `<foreach>` 标签的有效属性共 6 个：
-  | 属性 | 说明 |
-  |------|------|
-  | `collection` | 必填，要遍历的集合/数组名 |
-  | `item` | 每次迭代的元素变量名 |
-  | `index` | 当前索引（从0开始） |
-  | `open` | 开头字符串，如 `(` |
-  | `close` | 结尾字符串，如 `)` |
-  | `separator` | 元素之间的分隔符，如 `,` |
-- **`itif`** 不是任何合法属性名，纯干扰项
-- `collection` 是必填属性，`index` 和 `separator` 都是可选合法属性
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：itif 不是 MyBatis 的标签或属性
+- itif 不是 MyBatis 的标签或属性
 
 ---
 ### Q12 — Redis SCARD 集合运算
 
-**来源:** 每日一练 App
+**来源:** 新版题库 Excel（2026-09-25 同步）
 
-**题目:** 执行以下 Redis 命令后，`SCARD cd` 输出是什么？
-
-```text
-SADD ca "php" "java" "go" "c" "ruby" "julia"
-SMOVE ca cb "julia"
-SADD cb "ruby"
-SDIFFSTORE cc ca cb
-SMOVE cc ca "php"
-SREM ca "go" "ruby" "julia"
-SUNIONSTORE cd ca cc
-SCARD cd
-```
+**题目:** Git 生成 ssh 公钥的正确步骤是？
 
 **选项:**
-1. 4 ✅
-2. 3
-3. 6
-4. 2
+1. 1. 下载git 
+    2. 安装
+    3. 点击Git Base Here   输入`cd ~`
+    4. 创建文件夹`mkdir ~/.ssh`
+    5. 进入文件夹`cd .ssh`
+    6. 配置全局的name和email
+    7. 生成key
+    8. 回车
+2. 1. 下载git 
+    2. 安装
+    3. 配置全局的name和email
+    4. 创建文件夹`mkdir ~/.ssh`
+    5. 进入文件夹`cd .ssh`
+    6. 点击Git Base Here   输入`cd ~`
+    7. 生成key
+    8. 回车
+3. 1. 下载git 
+    2. 安装
+    3. 配置全局的name和email
+    4. 点击Git Base Here   输入`cd ~`
+    5. 创建文件夹`mkdir ~/.ssh`
+    6. 进入文件夹`cd .ssh`
+    7. 生成key
+    8. 回车 ✅
+4. 1. 下载git 
+    2. 安装
+    3. 创建文件夹`mkdir ~/.ssh`
+    4. 点击Git Base Here   输入`cd ~`
+    5. 进入文件夹`cd .ssh`
+    6. 配置全局的name和email
+    7. 生成key
+    8. 回车
 
-**我的答案:** 选项3（6） ❌
-**正确答案:** `4`
+**我的答案:** 选项1 ❌
+
+**正确答案:** 选项3
 
 **解析:**
-- **逐步推导：**
-  | 步骤 | 命令 | ca | cb | cc | cd |
-  |------|------|:--:|:--:|:--:|:--:|
-  | ① | `SADD ca 6个元素` | {php,java,go,c,ruby,julia} | ∅ | ∅ | ∅ |
-  | ② | `SMOVE ca→cb julia` | {php,java,go,c,ruby} | {julia} | ∅ | ∅ |
-  | ③ | `SADD cb ruby` | {php,java,go,c,ruby} | {julia,ruby} | ∅ | ∅ |
-  | ④ | `SDIFFSTORE cc ca⊖cb` | {php,java,go,c,ruby} | {julia,ruby} | **{php,java,go,c}** | ∅ |
-  | ⑤ | `SMOVE cc→ca php` | {php,java,go,c,ruby} | {julia,ruby} | {java,go,c} | ∅ |
-  | ⑥ | `SREM ca go ruby julia` | **{php,java,c}** | {julia,ruby} | {java,go,c} | ∅ |
-  | ⑦ | `SUNIONSTORE cd ca∪cc` | {php,java,c} | {julia,ruby} | {java,go,c} | **{php,java,c,go}** |
-  | ⑧ | `SCARD cd` | | | | **→ 4** |
-- **关键细节：**
-  - 步骤⑥：`julia` 早已不在 ca 中（步骤②已移到 cb），所以只移除了 `go` 和 `ruby`，ca 剩下 {php, java, c}
-  - 步骤⑦：并集 {php, java, c} ∪ {java, go, c} = {php, java, c, go}，共 4 个元素
-
-
-- 📌 Excel 题库同步（2026-09-25，选项顺序已同步）：
-  解析：``` SADD ca "php" "java" "go" "c" "ruby" "julia" #创建集合 ca:php java go c ruby julia SMOVE ca cb "julia" #把julia从ca移到cb中;cb:julia,ca:php java go c ruby SADD cb "ruby" ;添加元素;cb:julia ruby SDIFFSTORE cc ca cb #获取ca cb的差集 cc:php go c java SMOVE cc ca "php"  #把php从cc移到ca中 #cc:go c java #ca:php go c ruby SREM ca "go" "ruby" "julia" #删除元素;ca:php c SUNIONSTORE cd ca cc #获取ca cc的并集:cd:php go c java SCARD cd #输出cd的元素数量:4 ```
+- 1. **下载并安装 Git**：首先需要获取 Git 工具并完成安装，这是基础环境准备。
+- 2. **配置全局用户信息**：通过`git config --global user.name`和`user.email`设置用户名和邮箱，这是 Git 提交代码时的身份标识，应在生成密钥前配置。
+- 3. **打开 Git 命令行并进入用户目录**：点击`Git Bash Here`打开命令行，输入`cd ~`进入当前用户的家目录（后续操作均基于此目录）。
+- 4. **创建.ssh 目录**：在用户家目录下创建`.ssh`文件夹（`mkdir ~/.ssh`），用于存储密钥文件。
+- 5. **进入.ssh 目录**：通过`cd .ssh`进入该目录，后续生成的密钥将保存在这里。
+- 6. **生成密钥**：执行`ssh-keygen -t rsa -C "邮箱地址"`生成 ssh 密钥，按回车完成操作。
 
 ---
 ### Q13 — MyBatis 动态 SQL 说法
