@@ -169,6 +169,37 @@ if __name__ == '__main__':
 
 ---
 
+**写法二：O(n²) 动态规划（好懂好写，考场保底）**
+
+```
+dp[i] = 以 nums[i] 结尾的最长递增子序列的长度
+答案 = max(dp)
+```
+
+每个位置 i，往前看所有比它小的数 j，能接上就取 `dp[j] + 1` 的最大值：
+
+```python
+import sys
+import json
+
+class Solution:
+    def lengthOfLIS(self, nums):
+        dp = [1] * len(nums)          # dp[i] = 以 nums[i] 结尾的 LIS 长度
+        for i in range(len(nums)):
+            for j in range(i):        # 看 i 前面所有能接上的位置
+                if nums[j] < nums[i]:
+                    dp[i] = max(dp[i], dp[j] + 1)
+        return max(dp)
+
+if __name__ == '__main__':
+    nums = json.loads(sys.argv[1])
+    print(Solution().lengthOfLIS(nums), end="")
+```
+
+注：题里 n ≤ 2500，两种写法都能过。写法一 O(n log n) 更快但难背，写法二 O(n²) 直观可靠，考场稳为主。
+
+---
+
 ### 题目 4：图书及订阅人、订阅信息查询（SQL）
 
 **表结构：**
