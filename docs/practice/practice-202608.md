@@ -172,7 +172,8 @@ def is_match(s: str, p: str) -> bool:
 
 if __name__ == '__main__':
     s, p = sys.argv[1].split(';')
-    print(is_match(s, p), end='')
+    # Python 的 True/False 首字母大写，题目要求小写，需转小写输出
+    print(str(is_match(s, p)).lower(), end='')
 ```
 
 ---
